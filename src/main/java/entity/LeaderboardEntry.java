@@ -1,6 +1,5 @@
 package entity;
 
-// entities/LeaderboardEntry.java
 public class LeaderboardEntry {
     private final String userId;
     private final String username;
@@ -15,7 +14,6 @@ public class LeaderboardEntry {
         this.timeMs = timeMs;
     }
 
-    // getters...
     public String getUserId() {
         return userId;
     }
