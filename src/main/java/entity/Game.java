@@ -3,47 +3,55 @@ package entity;
 // entities/Game.java
 public class Game {
     private final String id;           // maybe userId+timestamp
-    private final int[][] board;       // current state
+    private int[][] board;       // current state
     private final int[][] initialBoard;
     private final String difficulty;   // "easy", "medium", ...
     private final String mode;         // "CASUAL" or "RANKED"
-    private final long elapsedMs;
-    private final boolean finished;
+    private long elapsedMs;             // snapshot of current elapse time at game end
+    private boolean finished;
 
     public Game(String id,
                 int[][] board,
-                int[][] initialBoard,
                 String difficulty,
                 String mode,
-                long elapsedMs,
-                boolean finished) {
+                long elapsedMs) {
         this.id = id;
         this.board = board;
-        this.initialBoard = initialBoard;
+        this.initialBoard = board;
         this.difficulty = difficulty;
         this.mode = mode;
         this.elapsedMs = elapsedMs;
-        this.finished = finished;
+        this.finished = false;
     }
 
     // getters only – keep it immutable for now
-}
-
-// entities/LeaderboardEntry.java
-public class LeaderboardEntry {
-    private final String userId;
-    private final String username;
-    private final String difficulty;
-    private final long timeMs;
-
-    public LeaderboardEntry(String userId, String username,
-                            String difficulty, long timeMs) {
-        this.userId = userId;
-        this.username = username;
-        this.difficulty = difficulty;
-        this.timeMs = timeMs;
+    public String getId() {
+        return id;
     }
 
-    // getters...
+    public int[][] getBoard() {
+        return board;
+    }
+    public int[][] getInitialBoard() {
+        return initialBoard;
+    }
+    public String getDifficulty() {
+        return difficulty;
+    }
+    public String getMode() {
+        return mode;
+    }
+    public long getElapsedMs() {
+        return elapsedMs;
+    }
+    public void setElapsedMs(long elapsedMs) {
+        this.elapsedMs = elapsedMs;
+    }
+    public void finish_game(){
+        this.finished = true;
+    }
+    public boolean isFinished() {
+        return finished;
+    }
 }
 
