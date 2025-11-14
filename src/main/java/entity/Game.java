@@ -29,21 +29,4 @@ public class Game {
     // getters only – keep it immutable for now
 }
 
-// entities/LeaderboardEntry.java
-public class LeaderboardEntry {
-    private final String userId;
-    private final String username;
-    private final String difficulty;
-    private final long timeMs;
-
-    public LeaderboardEntry(String userId, String username,
-                            String difficulty, long timeMs) {
-        this.userId = userId;
-        this.username = username;
-        this.difficulty = difficulty;
-        this.timeMs = timeMs;
-    }
-
-    // getters...
-}
 
