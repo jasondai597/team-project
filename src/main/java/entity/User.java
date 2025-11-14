@@ -1,16 +1,14 @@
 package entity;
 
-import java.util.UUID;
-
 public class User {
     private final String userId;
     private final String username;
     private final String password;
 
-    public User(String username, String password) {
+    public User(String username, String password, String userId) {
         this.username = username;
         this.password = password;
-        this.userId = UUID.randomUUID().toString();
+        this.userId = userId;
     }
 
     public String getUserId() {
