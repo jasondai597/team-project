@@ -1,5 +1,6 @@
 package entity;
 
+// entities/LeaderboardEntry.java
 public class LeaderboardEntry {
     private final String userId;
     private final String username;
@@ -15,4 +16,17 @@ public class LeaderboardEntry {
     }
 
     // getters...
+    public String getUserId() {
+        return userId;
+    }
+    public String getUsername() {
+        return username;
+    }
+
+    public String getDifficulty() {
+        return difficulty;
+    }
+    public long getTimeMs() {
+        return timeMs;
+    }
 }
