@@ -36,3 +36,6 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+### private key ###
+src/main/java/data_access/firebaseService.json
