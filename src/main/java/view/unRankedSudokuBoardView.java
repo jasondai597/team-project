@@ -41,12 +41,15 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
         JButton Hint = new JButton("HINT");
         Hint.setPreferredSize(new Dimension(200, 100));
+        Hint.addActionListener(this);
 
         JButton Check = new JButton("CHECK");
         Check.setPreferredSize(new Dimension(200, 100));
+        Check.addActionListener(this);
 
         JButton Forfeit = new JButton("FORFEIT");
         Forfeit.setPreferredSize(new Dimension(200, 100));
+        Forfeit.addActionListener(this);
 
         buttonPanel.add(Hint);
         buttonPanel.add(Check);
@@ -60,7 +63,19 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        String event = e.getActionCommand();
 
+        switch (event) {
+            case "HINT":
+                JOptionPane.showMessageDialog(this, "HINT");
+                break;
+            case "CHECK":
+                JOptionPane.showMessageDialog(this, "CHECK");
+                break;
+            case "FORFEIT":
+                JOptionPane.showMessageDialog(this, "FORFEIT");
+                break;
+        }
     }
 
     @Override
