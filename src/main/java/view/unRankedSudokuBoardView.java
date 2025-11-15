@@ -37,7 +37,24 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
 
             }
         }
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        JButton Hint = new JButton("HINT");
+        Hint.setPreferredSize(new Dimension(200, 100));
+
+        JButton Check = new JButton("CHECK");
+        Check.setPreferredSize(new Dimension(200, 100));
+
+        JButton Forfeit = new JButton("FORFEIT");
+        Forfeit.setPreferredSize(new Dimension(200, 100));
+
+        buttonPanel.add(Hint);
+        buttonPanel.add(Check);
+        buttonPanel.add(Forfeit);
+
         add(grid, BorderLayout.CENTER);
+        add(buttonPanel, BorderLayout.SOUTH);
+
 
     }
 
