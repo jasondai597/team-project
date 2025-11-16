@@ -73,8 +73,19 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
                 JOptionPane.showMessageDialog(this, "CHECK");
                 break;
             case "FORFEIT":
-                JOptionPane.showMessageDialog(this, "FORFEIT");
-                break;
+                int result = JOptionPane.showConfirmDialog(
+                        this,
+                        "Are you sure you want to forfeit?",
+                        "Confirm Forfeit",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.WARNING_MESSAGE
+                );
+
+                if (result == JOptionPane.YES_OPTION) {
+                    //This is temporary until we add the controllers to switch to mainView
+                    JOptionPane.showMessageDialog(this, "You forfeited the game!");
+                }
+
         }
     }
 
