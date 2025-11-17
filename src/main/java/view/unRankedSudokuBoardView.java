@@ -1,5 +1,12 @@
 package view;
 
+import API.SudokuApiClient;
+import data_access.SudokuRepositoryImpl;
+import interface_adapter.SudokuBoardViewModel;
+import interface_adapter.SudokuController;
+import interface_adapter.SudokuPresenter;
+import use_case.LoadingSudoku.LoadSudokuInteractor;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -11,8 +18,9 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
 
     private final JTextField[][] cells = new JTextField[9][9];
 
-    public unRankedSudokuBoardView() {
+    public unRankedSudokuBoardView(SudokuBoardViewModel viewModel, SudokuController controller) {
         setLayout(new BorderLayout());
+        viewModel.addPropertyChangeListener(this);
 
         JLabel title = new JLabel("SUDOKU-THING", SwingConstants.CENTER);
         title.setFont(new Font("SansSerif", Font.BOLD, 24));
@@ -59,6 +67,7 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
         add(buttonPanel, BorderLayout.SOUTH);
 
 
+
     }
 
     @Override
@@ -91,20 +100,38 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
+        if ("board".equals(evt.getPropertyName())) {
+            int[][] board = (int[][]) evt.getNewValue();
+            for (int r = 0; r < 9; r++) {
+                for (int c = 0; c < 9; c++) {
+                    cells[r][c].setText(board[r][c] == 0 ? "" : String.valueOf(board[r][c]));
+                }
+            }
+        } else if ("error".equals(evt.getPropertyName())) {
+            String message = (String) evt.getNewValue();
+            JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
+        }
+
 
     }
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            JFrame frame = new JFrame("Unranked Sudoku Board Test");
+            SudokuApiClient apiClient = new SudokuApiClient();
+            SudokuRepositoryImpl repo = new SudokuRepositoryImpl(apiClient);
+
+            SudokuBoardViewModel viewModel = new SudokuBoardViewModel();
+            SudokuPresenter presenter = new SudokuPresenter(viewModel);
+            LoadSudokuInteractor interactor = new LoadSudokuInteractor(repo, presenter);
+            SudokuController controller = new SudokuController(interactor);
+
+            unRankedSudokuBoardView view = new unRankedSudokuBoardView(viewModel, controller);
+
+            JFrame frame = new JFrame("Sudoku");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setSize(900, 900);
-            frame.setLayout(new BorderLayout());
-
-            unRankedSudokuBoardView boardView = new unRankedSudokuBoardView();
-
-            frame.add(boardView, BorderLayout.CENTER);
-
+            frame.add(view);
             frame.setVisible(true);
+            controller.loadPuzzle("easy");
 
         });
 
