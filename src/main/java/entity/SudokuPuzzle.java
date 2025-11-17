@@ -13,7 +13,7 @@ public final class SudokuPuzzle {
         this.difficulty = difficulty;
     }
 
-    public int[][] getInitial()   { return SudokuRules.copy(initial); }
+    public int[][] getInitial()   { return initial; }
     public int[][] getSolution()  { return solution == null ? null : SudokuRules.copy(solution); }
     public String  getDifficulty(){ return difficulty; }
 }
