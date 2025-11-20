@@ -14,6 +14,7 @@ public class SudokuPresenter implements LoadSudokuOutputBoundary {
     @Override
     public void present(SudokuPuzzle puzzle) {
        viewModel.setBoard(puzzle.getInitial());
+       viewModel.setSolution(puzzle.getSolution());
     }
     @Override
     public void presentError(String message) {

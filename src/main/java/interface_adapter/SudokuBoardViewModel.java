@@ -7,6 +7,8 @@ import java.beans.PropertyChangeSupport;
 public class SudokuBoardViewModel {
     private final PropertyChangeSupport support = new PropertyChangeSupport(this);
     private int[][] board;
+    private int[][] solution;
+
     private String errorMessage;
 
     public void setBoard(int[][] board) {
@@ -14,11 +16,23 @@ public class SudokuBoardViewModel {
         this.board = board;
         support.firePropertyChange("board", oldBoard, board);
     }
+    public void setSolution(int[][] solution) {
+        int [][] oldSolution = this.solution;
+        this.solution = solution;
+        support.firePropertyChange("solution", oldSolution, solution);
+    }
 
     public void setErrorMessage(String message) {
         String old = this.errorMessage;
         this.errorMessage = message;
         support.firePropertyChange("error", old, message);
+    }
+
+    public int[][] getBoard() {
+        return board;
+    }
+    public int[][] getSolution() {
+        return solution;
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
