@@ -17,8 +17,12 @@ import java.beans.PropertyChangeListener;
 public class unRankedSudokuBoardView extends JPanel implements ActionListener, PropertyChangeListener {
 
     private final JTextField[][] cells = new JTextField[9][9];
+    private final SudokuBoardViewModel viewModel;
+    private final SudokuController controller;
 
     public unRankedSudokuBoardView(SudokuBoardViewModel viewModel, SudokuController controller) {
+        this.viewModel = viewModel;
+        this.controller = controller;
         setLayout(new BorderLayout());
         viewModel.addPropertyChangeListener(this);
 
