@@ -8,7 +8,6 @@ public class SudokuBoardViewModel {
     private final PropertyChangeSupport support = new PropertyChangeSupport(this);
     private int[][] board;
     private int[][] solution;
-
     private String errorMessage;
 
     public void setBoard(int[][] board) {
@@ -39,5 +38,8 @@ public class SudokuBoardViewModel {
         support.addPropertyChangeListener(listener);
     }
 
+    public void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
+        support.firePropertyChange(propertyName, oldValue, newValue);
+    }
 
 }
