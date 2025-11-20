@@ -2,13 +2,11 @@ package view;
 
 import API.SudokuApiClient;
 import data_access.SudokuRepositoryImpl;
-import interface_adapter.SudokuBoardViewModel;
-import interface_adapter.SudokuController;
-import interface_adapter.SudokuPresenter;
-import interface_adapter.hintController;
+import entity.SudokuPuzzle;
+import interface_adapter.*;
 import use_case.LoadingSudoku.LoadSudokuInteractor;
 import use_case.hints.HintInteractor;
-import interface_adapter.HintPresenter;
+import use_case.processUserMoves.ProcessInteractor;
 
 import javax.swing.*;
 import java.awt.*;
@@ -23,10 +21,13 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
     private final SudokuBoardViewModel viewModel;
     private final SudokuController controller;
     private final hintController hint;
-    public unRankedSudokuBoardView(SudokuBoardViewModel viewModel, SudokuController controller, hintController hintController) {
+    private final processController process;
+    public unRankedSudokuBoardView(SudokuBoardViewModel viewModel, SudokuController controller
+            , hintController hintController, processController process) {
         this.viewModel = viewModel;
         this.controller = controller;
         this.hint = hintController;
+        this.process = process;
         setLayout(new BorderLayout());
         viewModel.addPropertyChangeListener(this);
 
@@ -41,6 +42,19 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
             for (int c = 0; c < 9; c++) {
                 JTextField tf = new JTextField();
                 tf.setHorizontalAlignment(JTextField.CENTER);
+                tf.setOpaque(true);
+                tf.setBackground(Color.WHITE);
+                final int finalR = r;
+                final int finalC = c;
+                tf.addActionListener(e -> {
+                    try {
+                        String text = tf.getText();
+                        int value = text.isEmpty() ? 0 : Integer.parseInt(text);
+                        process.processMove(finalR, finalC, value);
+                    } catch (NumberFormatException ex) {
+                        tf.setText("");
+                    }
+                });
 
                 int top = (r % 3 == 0) ? 3 : 1;
                 int left = (c % 3 == 0) ? 3 : 1;
@@ -127,6 +141,7 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
             SudokuApiClient apiClient = new SudokuApiClient();
             SudokuRepositoryImpl repo = new SudokuRepositoryImpl(apiClient);
 
+
             SudokuBoardViewModel viewModel = new SudokuBoardViewModel();
             SudokuPresenter presenter = new SudokuPresenter(viewModel);
             LoadSudokuInteractor interactor = new LoadSudokuInteractor(repo, presenter);
@@ -136,8 +151,15 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
             HintInteractor hintinteractor = new HintInteractor(viewModel, hintPresenter);
             hintController hint = new hintController(hintinteractor);
 
-            unRankedSudokuBoardView view = new unRankedSudokuBoardView(viewModel, controller, hint);
             controller.loadPuzzle("easy");
+
+            SudokuPuzzle puzzle = interactor.getCurrentPuzzle();
+            processPresenter processPresenter = new processPresenter(viewModel);
+            ProcessInteractor processInteractor = new ProcessInteractor(puzzle, processPresenter);
+            processController processController = new processController(processInteractor);
+
+            unRankedSudokuBoardView view = new unRankedSudokuBoardView(viewModel, controller, hint, processController);
+
 
             JFrame frame = new JFrame("Sudoku");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

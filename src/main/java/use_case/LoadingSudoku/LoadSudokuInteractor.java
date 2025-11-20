@@ -6,6 +6,7 @@ import org.json.JSONObject;
 public class LoadSudokuInteractor {
     private final SudokuRepository repository;
     private final LoadSudokuOutputBoundary presenter;
+    private SudokuPuzzle currentPuzzle;
 
     public LoadSudokuInteractor(SudokuRepository repository, LoadSudokuOutputBoundary presenter) {
         this.repository = repository;
@@ -19,12 +20,17 @@ public class LoadSudokuInteractor {
             String solution = json.getString("solution");
             int[][] board = SudokuBoardParser.parse(puzzle);
             int[][] solutionBoard = SudokuBoardParser.parse(solution);
-            SudokuPuzzle game = new SudokuPuzzle(board, solutionBoard, request.getDifficulty());
+            currentPuzzle = new SudokuPuzzle(board, solutionBoard, request.getDifficulty());
 
-            presenter.present(game);
+            presenter.present(currentPuzzle);
         } catch (Exception e) {
             presenter.presentError("Failed to load board: " + e.getMessage());
         }
     }
+
+    public SudokuPuzzle getCurrentPuzzle() {
+        return currentPuzzle;
+    }
+
 
 }
