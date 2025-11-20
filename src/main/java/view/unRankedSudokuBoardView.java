@@ -5,7 +5,10 @@ import data_access.SudokuRepositoryImpl;
 import interface_adapter.SudokuBoardViewModel;
 import interface_adapter.SudokuController;
 import interface_adapter.SudokuPresenter;
+import interface_adapter.hintController;
 import use_case.LoadingSudoku.LoadSudokuInteractor;
+import use_case.hints.HintInteractor;
+import interface_adapter.HintPresenter;
 
 import javax.swing.*;
 import java.awt.*;
@@ -19,10 +22,11 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
     private final JTextField[][] cells = new JTextField[9][9];
     private final SudokuBoardViewModel viewModel;
     private final SudokuController controller;
-
-    public unRankedSudokuBoardView(SudokuBoardViewModel viewModel, SudokuController controller) {
+    private final hintController hint;
+    public unRankedSudokuBoardView(SudokuBoardViewModel viewModel, SudokuController controller, hintController hintController) {
         this.viewModel = viewModel;
         this.controller = controller;
+        this.hint = hintController;
         setLayout(new BorderLayout());
         viewModel.addPropertyChangeListener(this);
 
@@ -80,10 +84,10 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
 
         switch (event) {
             case "HINT":
-                JOptionPane.showMessageDialog(this, "HINT");
+                hint.hint();
                 break;
             case "CHECK":
-                JOptionPane.showMessageDialog(this, "CHECK");
+
                 break;
             case "FORFEIT":
                 int result = JOptionPane.showConfirmDialog(
@@ -128,14 +132,18 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
             LoadSudokuInteractor interactor = new LoadSudokuInteractor(repo, presenter);
             SudokuController controller = new SudokuController(interactor);
 
-            unRankedSudokuBoardView view = new unRankedSudokuBoardView(viewModel, controller);
+            HintPresenter hintPresenter = new HintPresenter(viewModel);
+            HintInteractor hintinteractor = new HintInteractor(viewModel, hintPresenter);
+            hintController hint = new hintController(hintinteractor);
+
+            unRankedSudokuBoardView view = new unRankedSudokuBoardView(viewModel, controller, hint);
+            controller.loadPuzzle("easy");
 
             JFrame frame = new JFrame("Sudoku");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setSize(900, 900);
             frame.add(view);
             frame.setVisible(true);
-            controller.loadPuzzle("easy");
 
         });
 
