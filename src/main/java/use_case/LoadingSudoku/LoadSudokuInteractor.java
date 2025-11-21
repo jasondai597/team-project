@@ -4,6 +4,7 @@ import entity.SudokuPuzzle;
 import org.json.JSONObject;
 import use_case.game.GameDataAccess;
 
+
 public class LoadSudokuInteractor {
     private final SudokuRepository repository;
     private final LoadSudokuOutputBoundary presenter;
