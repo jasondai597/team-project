@@ -2,15 +2,27 @@ package use_case.LoadingSudoku;
 
 import entity.SudokuPuzzle;
 import org.json.JSONObject;
+import use_case.game.GameDataAccess;
 
 public class LoadSudokuInteractor {
     private final SudokuRepository repository;
     private final LoadSudokuOutputBoundary presenter;
+    private final GameDataAccess gameDataAccess;  // 🔹 new field
     private SudokuPuzzle currentPuzzle;
 
-    public LoadSudokuInteractor(SudokuRepository repository, LoadSudokuOutputBoundary presenter) {
+    // 🔹 New main constructor (we'll start using this later)
+    public LoadSudokuInteractor(SudokuRepository repository,
+                                LoadSudokuOutputBoundary presenter,
+                                GameDataAccess gameDataAccess) {
         this.repository = repository;
         this.presenter = presenter;
+        this.gameDataAccess = gameDataAccess;
+    }
+
+    // 🔹 Old constructor kept for compatibility (uses null for now)
+    public LoadSudokuInteractor(SudokuRepository repository,
+                                LoadSudokuOutputBoundary presenter) {
+        this(repository, presenter, null);
     }
 
     public void execute(LoadSudokuRequestModel request) {
@@ -31,6 +43,4 @@ public class LoadSudokuInteractor {
     public SudokuPuzzle getCurrentPuzzle() {
         return currentPuzzle;
     }
-
-
 }
