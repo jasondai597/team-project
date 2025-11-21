@@ -23,5 +23,12 @@ public class SudokuRepositoryImpl implements SudokuRepository {
         return puzzle;
     }
 
+    @Override
+    public JSONObject fetchSudokuJSON(String difficulty) throws Exception {
+        JSONObject json = apiClient.fetchPuzzle(difficulty);
+        return json;
+    }
+
+
 }
 
