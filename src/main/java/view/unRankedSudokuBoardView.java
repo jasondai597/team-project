@@ -7,6 +7,11 @@ import interface_adapter.*;
 import use_case.LoadingSudoku.LoadSudokuInteractor;
 import use_case.hints.HintInteractor;
 import use_case.processUserMoves.ProcessInteractor;
+//Added data_access feature
+import data_access.InMemoryGameDataAccess;
+import use_case.game.GameDataAccess;
+import entity.Game;
+
 
 import javax.swing.*;
 import java.awt.*;
@@ -141,10 +146,11 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
             SudokuApiClient apiClient = new SudokuApiClient();
             SudokuRepositoryImpl repo = new SudokuRepositoryImpl(apiClient);
 
-
             SudokuBoardViewModel viewModel = new SudokuBoardViewModel();
             SudokuPresenter presenter = new SudokuPresenter(viewModel);
-            LoadSudokuInteractor interactor = new LoadSudokuInteractor(repo, presenter);
+
+            GameDataAccess gameDataAccess = new InMemoryGameDataAccess();
+            LoadSudokuInteractor interactor = new LoadSudokuInteractor(repo, presenter, gameDataAccess);
             SudokuController controller = new SudokuController(interactor);
 
             HintPresenter hintPresenter = new HintPresenter(viewModel);
@@ -152,23 +158,35 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
             hintController hint = new hintController(hintinteractor);
 
             controller.loadPuzzle("easy");
+            controller.loadPuzzle("medium");
+            controller.loadPuzzle("hard");
+            System.out.println("Number of games stored: " + gameDataAccess.listAll().size());
+            for (Game g : gameDataAccess.listAll()) {
+                System.out.println(g.getId() + " | " + g.getDifficulty());
+            }
+
+            //testing if the Game is stored
+            System.out.println("Number of games stored: " + gameDataAccess.listAll().size());
+            if (!gameDataAccess.listAll().isEmpty()) {
+                System.out.println("First game id: " + gameDataAccess.listAll().get(0).getId());
+                System.out.println("First game difficulty: " + gameDataAccess.listAll().get(0).getDifficulty());
+            }
+
 
             SudokuPuzzle puzzle = interactor.getCurrentPuzzle();
             processPresenter processPresenter = new processPresenter(viewModel);
             ProcessInteractor processInteractor = new ProcessInteractor(puzzle, processPresenter);
             processController processController = new processController(processInteractor);
 
-            unRankedSudokuBoardView view = new unRankedSudokuBoardView(viewModel, controller, hint, processController);
-
+            unRankedSudokuBoardView view =
+                    new unRankedSudokuBoardView(viewModel, controller, hint, processController);
 
             JFrame frame = new JFrame("Sudoku");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setSize(900, 900);
             frame.add(view);
             frame.setVisible(true);
-
         });
-
     }
-
 }
+
