@@ -7,6 +7,9 @@ import interface_adapter.*;
 import use_case.LoadingSudoku.LoadSudokuInteractor;
 import use_case.hints.HintInteractor;
 import use_case.processUserMoves.ProcessInteractor;
+import data_access.InMemoryGameDataAccess;
+import use_case.game.GameDataAccess;
+
 
 import javax.swing.*;
 import java.awt.*;
@@ -141,10 +144,11 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
             SudokuApiClient apiClient = new SudokuApiClient();
             SudokuRepositoryImpl repo = new SudokuRepositoryImpl(apiClient);
 
-
             SudokuBoardViewModel viewModel = new SudokuBoardViewModel();
             SudokuPresenter presenter = new SudokuPresenter(viewModel);
-            LoadSudokuInteractor interactor = new LoadSudokuInteractor(repo, presenter);
+
+            GameDataAccess gameDataAccess = new InMemoryGameDataAccess();
+            LoadSudokuInteractor interactor = new LoadSudokuInteractor(repo, presenter, gameDataAccess);
             SudokuController controller = new SudokuController(interactor);
 
             HintPresenter hintPresenter = new HintPresenter(viewModel);
@@ -158,17 +162,14 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
             ProcessInteractor processInteractor = new ProcessInteractor(puzzle, processPresenter);
             processController processController = new processController(processInteractor);
 
-            unRankedSudokuBoardView view = new unRankedSudokuBoardView(viewModel, controller, hint, processController);
-
+            unRankedSudokuBoardView view =
+                    new unRankedSudokuBoardView(viewModel, controller, hint, processController);
 
             JFrame frame = new JFrame("Sudoku");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setSize(900, 900);
             frame.add(view);
             frame.setVisible(true);
-
         });
-
     }
-
 }
