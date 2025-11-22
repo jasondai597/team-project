@@ -157,6 +157,13 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
             hintController hint = new hintController(hintinteractor);
 
             controller.loadPuzzle("easy");
+            //testing if the Game is stored
+            System.out.println("Number of games stored: " + gameDataAccess.listAll().size());
+            if (!gameDataAccess.listAll().isEmpty()) {
+                System.out.println("First game id: " + gameDataAccess.listAll().get(0).getId());
+                System.out.println("First game difficulty: " + gameDataAccess.listAll().get(0).getDifficulty());
+            }
+
 
             SudokuPuzzle puzzle = interactor.getCurrentPuzzle();
             processPresenter processPresenter = new processPresenter(viewModel);
