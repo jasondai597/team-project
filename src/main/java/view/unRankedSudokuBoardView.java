@@ -10,7 +10,6 @@ import use_case.processUserMoves.ProcessInteractor;
 //Added data_access feature
 import data_access.InMemoryGameDataAccess;
 import use_case.game.GameDataAccess;
-import entity.Game;
 
 
 import javax.swing.*;
