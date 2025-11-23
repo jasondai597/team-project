@@ -6,9 +6,21 @@ import java.beans.PropertyChangeSupport;
 
 public class SudokuBoardViewModel {
     private final PropertyChangeSupport support = new PropertyChangeSupport(this);
+    private int[][] initialBoard;
     private int[][] board;
     private int[][] solution;
     private String errorMessage;
+
+    public void setInitialBoard(int[][] initialBoard) {
+        int[][] old = this.initialBoard;
+        this.initialBoard = initialBoard;
+        support.firePropertyChange("initialBoard", old, initialBoard);
+    }
+
+    public int[][] getInitialBoard() {
+        return initialBoard;
+    }
+
 
     public void setBoard(int[][] board) {
         int[][] oldBoard = this.board;

@@ -12,10 +12,12 @@ public class processPresenter implements ProcessOutputBoundary {
     @Override
     public void presentSuccess(int row, int col, int value) {
         int[][] board = viewModel.getBoard();
-        int[][] newBoard = board.clone();
+        int[][] newBoard = new int[9][9];
+        for (int r = 0; r < 9; r++) {
+            newBoard[r] = board[r].clone();
+        }
         newBoard[row][col] = value;
         viewModel.setBoard(newBoard);
-
     }
 
     @Override
