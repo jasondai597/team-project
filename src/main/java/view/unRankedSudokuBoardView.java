@@ -78,6 +78,13 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
             }
         }
 
+        // if a puzzle was already loaded into the viewModel before this view
+        // was constructed, initialize the UI from the model now.
+        int[][] current = viewModel.getBoard();
+        if (current != null) {
+            updateBoard(current);
+        }
+
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
         JButton Hint = new JButton("HINT");
         Hint.setPreferredSize(new Dimension(200, 100));
@@ -180,6 +187,25 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
         }
 
 
+    }
+
+    private void updateBoard(int[][] board) {
+        int[][] initial = viewModel.getInitialBoard();
+        for (int r = 0; r < 9; r++) {
+            for (int c = 0; c < 9; c++) {
+                JTextField tf = cells[r][c];
+                int val = board[r][c];
+                tf.setText(val == 0 ? "" : String.valueOf(val));
+
+                if (initial != null && initial[r][c] != 0) {
+                    tf.setEditable(false);
+                    tf.setBackground(new Color(230,230,230));
+                } else {
+                    tf.setEditable(true);
+                    tf.setBackground(Color.WHITE);
+                }
+            }
+        }
     }
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
