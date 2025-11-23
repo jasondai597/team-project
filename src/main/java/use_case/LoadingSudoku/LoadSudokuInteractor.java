@@ -4,7 +4,7 @@ import org.json.JSONObject;
 import use_case.game.GameDataAccess;
 import entity.Game;
 
-public class LoadSudokuInteractor {
+public class LoadSudokuInteractor implements LoadSudokuInputBoundary {
     private final SudokuRepository repository;
     private final LoadSudokuOutputBoundary presenter;
     private final GameDataAccess gameDataAccess;  // 🔹 new field
@@ -25,7 +25,7 @@ public class LoadSudokuInteractor {
         this(repository, presenter, null);
     }
 
-    public void execute(LoadSudokuRequestModel request) {
+    public void execute(LoadSudokuInputData request) {
         try {
             JSONObject json = repository.fetchSudokuJSON(request.getDifficulty());
             String puzzle = json.getString("puzzle");
