@@ -3,25 +3,21 @@ package use_case.hints;
 import interface_adapter.SudokuBoardViewModel;
 
 public class HintInteractor implements HintInputBoundary{
-    private final SudokuBoardViewModel viewModel;
     private final HintOutputBoundary presenter;
 
-    public HintInteractor(SudokuBoardViewModel viewModel,
+    public HintInteractor(
                           HintOutputBoundary presenter) {
-        this.viewModel = viewModel;
         this.presenter = presenter;
     }
 
-    public void execute() {
-
-        int[][] board = viewModel.getBoard();
-        int[][] solution = viewModel.getSolution();
-
+    public void execute(hintInputData inputData) {
+        int[][] sudokuBoard = inputData.getBoard();
+        int[][] sudokuSolution = inputData.getSolution();
         for (int r = 0; r < 9; r++) {
             for (int c = 0; c < 9; c++) {
-                if (board[r][c] != solution[r][c]) {
+                if (sudokuBoard[r][c] != sudokuSolution[r][c]) {
 
-                    int correctVal = solution[r][c];
+                    int correctVal = sudokuSolution[r][c];
 
                     presenter.presentHint(r, c, correctVal);
                     return;

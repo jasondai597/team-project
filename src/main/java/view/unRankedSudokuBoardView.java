@@ -6,6 +6,7 @@ import entity.SudokuPuzzle;
 import interface_adapter.*;
 import use_case.LoadingSudoku.LoadSudokuInteractor;
 import use_case.hints.HintInteractor;
+import use_case.processUserMoves.ProcessInputData;
 import use_case.processUserMoves.ProcessInteractor;
 //Added data_access feature
 import data_access.InMemoryGameDataAccess;
@@ -48,13 +49,15 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
                 tf.setHorizontalAlignment(JTextField.CENTER);
                 tf.setOpaque(true);
                 tf.setBackground(Color.WHITE);
+                tf.setFont(new Font("SansSerif", Font.BOLD, 30));
                 final int finalR = r;
                 final int finalC = c;
                 tf.addActionListener(e -> {
                     try {
                         String text = tf.getText();
                         int value = text.isEmpty() ? 0 : Integer.parseInt(text);
-                        process.processMove(finalR, finalC, value);
+                        ProcessInputData inputData = new ProcessInputData(finalR, finalC, value);
+                        process.processMove(inputData);
                     } catch (NumberFormatException ex) {
                         tf.setText("");
                     }
@@ -102,7 +105,7 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
 
         switch (event) {
             case "HINT":
-                hint.hint();
+                hint.hint(viewModel.getBoard(), viewModel.getSolution());
                 break;
             case "CHECK":
 
@@ -127,13 +130,28 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if ("board".equals(evt.getPropertyName())) {
+
             int[][] board = (int[][]) evt.getNewValue();
+            int[][] initial = viewModel.getInitialBoard();
             for (int r = 0; r < 9; r++) {
                 for (int c = 0; c < 9; c++) {
-                    cells[r][c].setText(board[r][c] == 0 ? "" : String.valueOf(board[r][c]));
+
+                    JTextField tf = cells[r][c];
+                    int val = board[r][c];
+
+                    tf.setText(val == 0 ? "" : String.valueOf(val));
+
+                    if (initial[r][c] != 0) {
+                        tf.setEditable(false);
+                        tf.setBackground(new Color(230,230,230));
+                    } else {
+                        tf.setEditable(true);
+                        tf.setBackground(Color.WHITE);
+                    }
                 }
             }
-        } else if ("error".equals(evt.getPropertyName())) {
+        }
+        else if ("error".equals(evt.getPropertyName())) {
             String message = (String) evt.getNewValue();
             JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
         }
@@ -142,6 +160,7 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
     }
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
+
             SudokuApiClient apiClient = new SudokuApiClient();
             SudokuRepositoryImpl repo = new SudokuRepositoryImpl(apiClient);
 
@@ -153,7 +172,7 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
             SudokuController controller = new SudokuController(interactor);
 
             HintPresenter hintPresenter = new HintPresenter(viewModel);
-            HintInteractor hintinteractor = new HintInteractor(viewModel, hintPresenter);
+            HintInteractor hintinteractor = new HintInteractor(hintPresenter);
             hintController hint = new hintController(hintinteractor);
 
             controller.loadPuzzle("easy");
