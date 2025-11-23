@@ -55,6 +55,23 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
                 tf.setFont(new Font("SansSerif", Font.BOLD, 30));
                 final int finalR = r;
                 final int finalC = c;
+
+                // Add document filter to restrict input to single digit 1-9
+                ((javax.swing.text.AbstractDocument) tf.getDocument()).setDocumentFilter(new javax.swing.text.DocumentFilter() {
+                    @Override
+                    public void replace(FilterBypass fb, int offset, int length, String text, javax.swing.text.AttributeSet attrs)
+                            throws javax.swing.text.BadLocationException {
+                        if (text == null || text.isEmpty()) {
+                            super.replace(fb, offset, length, text, attrs);
+                            return;
+                        }
+                        // Only allow single digit 1-9
+                        if (text.matches("[1-9]") && fb.getDocument().getLength() - length < 1) {
+                            super.replace(fb, offset, length, text, attrs);
+                        }
+                    }
+                });
+
                 tf.addActionListener(e -> {
                     try {
                         String text = tf.getText();
