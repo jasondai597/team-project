@@ -4,6 +4,7 @@ import API.SudokuApiClient;
 import data_access.SudokuRepositoryImpl;
 import entity.SudokuPuzzle;
 import interface_adapter.*;
+import use_case.Check.CheckInteractor;
 import use_case.LoadingSudoku.LoadSudokuInteractor;
 import use_case.hints.HintInteractor;
 import use_case.processUserMoves.ProcessInputData;
@@ -27,12 +28,14 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
     private final SudokuController controller;
     private final hintController hint;
     private final processController process;
+    private final CheckController check;
     public unRankedSudokuBoardView(SudokuBoardViewModel viewModel, SudokuController controller
-            , hintController hintController, processController process) {
+            , hintController hintController, processController process, CheckController check) {
         this.viewModel = viewModel;
         this.controller = controller;
         this.hint = hintController;
         this.process = process;
+        this.check = check;
         setLayout(new BorderLayout());
         viewModel.addPropertyChangeListener(this);
 
@@ -108,6 +111,7 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
                 hint.hint(viewModel.getBoard(), viewModel.getSolution());
                 break;
             case "CHECK":
+                check.check(viewModel.getBoard(), viewModel.getSolution());
 
                 break;
             case "FORFEIT":
@@ -123,6 +127,8 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
                     //This is temporary until we add the controllers to switch to mainView
                     JOptionPane.showMessageDialog(this, "You forfeited the game!");
                 }
+                break;
+
 
         }
     }
@@ -150,6 +156,23 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
                     }
                 }
             }
+        }
+        else if ("incorrect".equals(evt.getPropertyName())) {
+            boolean[][] incorrect = (boolean[][]) evt.getNewValue();
+            int[][] initial = viewModel.getInitialBoard();
+
+            for(int r = 0; r < 9; r++){
+                for(int c = 0; c < 9; c++){
+                    JTextField tf = cells[r][c];
+                    if(incorrect[r][c]){
+                        tf.setBackground(Color.RED);
+                    }
+                    else{
+                        tf.setBackground(Color.GREEN);
+                    }
+                }
+            }
+
         }
         else if ("error".equals(evt.getPropertyName())) {
             String message = (String) evt.getNewValue();
@@ -189,8 +212,12 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
             ProcessInteractor processInteractor = new ProcessInteractor(puzzle, processPresenter);
             processController processController = new processController(processInteractor);
 
+            CheckPresenter checkPresenter = new CheckPresenter(viewModel);
+            CheckInteractor checkInteractor = new CheckInteractor(checkPresenter);
+            CheckController check = new CheckController(checkInteractor);
+
             unRankedSudokuBoardView view =
-                    new unRankedSudokuBoardView(viewModel, controller, hint, processController);
+                    new unRankedSudokuBoardView(viewModel, controller, hint, processController, check);
 
             JFrame frame = new JFrame("Sudoku");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
