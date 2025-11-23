@@ -2,7 +2,7 @@ package use_case.LoadingSudoku;
 import entity.SudokuPuzzle;
 import org.json.JSONObject;
 import use_case.game.GameDataAccess;
-
+import entity.Game;
 
 public class LoadSudokuInteractor {
     private final SudokuRepository repository;
