@@ -9,6 +9,7 @@ public class SudokuBoardViewModel {
     private int[][] initialBoard;
     private int[][] board;
     private int[][] solution;
+    private boolean[][] incorrectCells;
     private String errorMessage;
 
     public void setInitialBoard(int[][] initialBoard) {
@@ -45,10 +46,23 @@ public class SudokuBoardViewModel {
     public int[][] getSolution() {
         return solution;
     }
+    public boolean[][] getIncorrectCells() {
+        return incorrectCells;
+    }
+
+    public void setIncorrectCells(boolean[][] incorrectCells) {
+        boolean[][] old = this.incorrectCells;
+
+        this.incorrectCells = new boolean[9][9];
+        for (int i = 0; i < 9; i++) this.incorrectCells[i] = incorrectCells[i].clone();
+
+        support.firePropertyChange("incorrect", old, this.incorrectCells);
+    }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         support.addPropertyChangeListener(listener);
     }
+
 
     public void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
         support.firePropertyChange(propertyName, oldValue, newValue);
