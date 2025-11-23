@@ -12,9 +12,13 @@ public class HintPresenter implements HintOutputBoundary {
     @Override
     public void presentHint(int r, int c, int value) {
         int[][] board = viewModel.getBoard();
-        board[r][c] = value;
-        viewModel.setBoard(board);
-        viewModel.firePropertyChange("board", null, board);
+        int[][] newBoard = new int[9][9];
+        for (int i = 0; i < 9; i++) {
+            System.arraycopy(board[i], 0, newBoard[i], 0, 9);
+        }
+        newBoard[r][c] = value;
+        viewModel.setBoard(newBoard);
+
 
     }
 
