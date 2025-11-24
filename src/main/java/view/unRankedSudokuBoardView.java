@@ -139,6 +139,14 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
                 );
 
                 if (result == JOptionPane.YES_OPTION) {
+
+                    int[][] currentBoard = viewModel.getBoard();
+
+                    controller.saveGame(currentBoard);
+
+                    System.out.println("Saved game on quit!");
+
+                    JOptionPane.showMessageDialog(this, "You forfeited the game! Progress saved.");
                     forfeitController.showForfeit();
                 }
                 break;

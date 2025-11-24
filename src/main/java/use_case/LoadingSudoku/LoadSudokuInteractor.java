@@ -7,10 +7,12 @@ import entity.Game;
 public class LoadSudokuInteractor implements LoadSudokuInputBoundary {
     private final SudokuRepository repository;
     private final LoadSudokuOutputBoundary presenter;
-    private final GameDataAccess gameDataAccess;  // 🔹 new field
+    private final GameDataAccess gameDataAccess;  //
     private SudokuPuzzle currentPuzzle;
+    private String currentGameId;
+    private String currentDifficulty;
+    private String currentMode;
 
-    // 🔹 New main constructor (we'll start using this later)
     public LoadSudokuInteractor(SudokuRepository repository,
                                 LoadSudokuOutputBoundary presenter,
                                 GameDataAccess gameDataAccess) {
@@ -19,33 +21,55 @@ public class LoadSudokuInteractor implements LoadSudokuInputBoundary {
         this.gameDataAccess = gameDataAccess;
     }
 
-    // 🔹 Old constructor kept for compatibility (uses null for now)
     public LoadSudokuInteractor(SudokuRepository repository,
                                 LoadSudokuOutputBoundary presenter) {
         this(repository, presenter, null);
     }
+
+    public void saveCurrentGameState(int[][] currentBoard) {
+        // If we don't have persistence or no loaded game, do nothing
+        if (gameDataAccess == null || currentGameId == null) {
+            return;
+        }
+
+        int[][] boardCopy = copyBoard(currentBoard);
+
+        // For now we keep elapsedMs = 0; you can add a timer later
+        Game updated = new Game(
+                currentGameId,
+                boardCopy,
+                currentDifficulty,
+                currentMode,
+                0L
+        );
+
+        gameDataAccess.save(updated);
+    }
+
 
     public void execute(LoadSudokuInputData request) {
         try {
             JSONObject json = repository.fetchSudokuJSON(request.getDifficulty());
             String puzzle = json.getString("puzzle");
             String solution = json.getString("solution");
-
             int[][] board = SudokuBoardParser.parse(puzzle);
             int[][] solutionBoard = SudokuBoardParser.parse(solution);
             currentPuzzle = new SudokuPuzzle(board, solutionBoard, request.getDifficulty());
 
-            // 🔹 use GameDataAccess if provided
+            this.currentDifficulty = request.getDifficulty();
+            this.currentMode = "CASUAL";
+
             if (gameDataAccess != null) {
                 String gameId = gameDataAccess.generateId();
+                this.currentGameId = gameId;
 
                 int[][] currentCopy = copyBoard(board);
 
                 Game game = new Game(
                         gameId,
                         currentCopy,
-                        request.getDifficulty(),
-                        "CASUAL",
+                        currentDifficulty,
+                        currentMode,
                         0L
                 );
 
@@ -71,3 +95,5 @@ public class LoadSudokuInteractor implements LoadSudokuInputBoundary {
         return currentPuzzle;
     }
 }
+
+
