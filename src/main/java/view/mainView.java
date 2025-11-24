@@ -139,10 +139,7 @@ public class mainView extends JPanel implements ActionListener, PropertyChangeLi
             use_case.hints.HintInteractor hintinteractor = new use_case.hints.HintInteractor(hintPresenter);
             interface_adapter.hintController hint = new interface_adapter.hintController(hintinteractor);
 
-            rankedSudokuBoardView ranked = new rankedSudokuBoardView();
-
             container.add(main, "main");
-            container.add(ranked, "ranked");
 
             JFrame frame = new JFrame("Sudoku App");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -165,6 +162,9 @@ public class mainView extends JPanel implements ActionListener, PropertyChangeLi
 
             unRankedSudokuBoardView unranked = new unRankedSudokuBoardView(viewModel, controller, hint, processController, check);
             container.add(unranked, "unranked");
+
+            rankedSudokuBoardView ranked = new rankedSudokuBoardView(viewModel, controller, hint, processController, check);
+            container.add(ranked, "ranked");
         });
     }
 
