@@ -11,9 +11,17 @@ public class ForfeitView extends JPanel implements ActionListener {
 
     private final JButton okButton = new JButton("OK");
     private final JFrame frame;
+    private CardLayout cardLayout;
+    private JPanel cardContainer;
 
     public ForfeitView(JFrame frame, Game gameInfo) {
+        this(frame, gameInfo, null, null);
+    }
+
+    public ForfeitView(JFrame frame, Game gameInfo, CardLayout cardLayout, JPanel cardContainer) {
         this.frame = frame;
+        this.cardLayout = cardLayout;
+        this.cardContainer = cardContainer;
         setLayout(new BorderLayout(20, 20));
 
         JPanel infoPanel = new JPanel();
@@ -54,7 +62,9 @@ public class ForfeitView extends JPanel implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        //To Implement
+        if (cardLayout != null && cardContainer != null) {
+            cardLayout.show(cardContainer, "main");
+        }
     }
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {

@@ -20,6 +20,8 @@ public class rankedSudokuBoardView extends JPanel implements ActionListener, Pro
     private final hintController hint;
     private final processController process;
     private final CheckController check;
+    private CardLayout cardLayout;
+    private JPanel cardContainer;
 
     // Backwards-compatible no-arg constructor shows an empty board for quick tests
     public rankedSudokuBoardView() {
@@ -146,6 +148,11 @@ public class rankedSudokuBoardView extends JPanel implements ActionListener, Pro
         }
     }
 
+    public void setCardContext(CardLayout layout, JPanel container) {
+        this.cardLayout = layout;
+        this.cardContainer = container;
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         String event = e.getActionCommand();
@@ -159,7 +166,11 @@ public class rankedSudokuBoardView extends JPanel implements ActionListener, Pro
             );
 
             if (result == JOptionPane.YES_OPTION) {
-                JOptionPane.showMessageDialog(this, "You forfeited the game!");
+                if (cardLayout != null && cardContainer != null) {
+                    cardLayout.show(cardContainer, "forfeit");
+                } else {
+                    JOptionPane.showMessageDialog(this, "You forfeited the game!");
+                }
             }
         }
     }
