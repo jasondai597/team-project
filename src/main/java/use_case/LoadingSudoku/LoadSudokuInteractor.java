@@ -3,6 +3,7 @@ import entity.SudokuPuzzle;
 import org.json.JSONObject;
 import use_case.game.GameDataAccess;
 import entity.Game;
+import java.util.List;
 
 public class LoadSudokuInteractor implements LoadSudokuInputBoundary {
     private final SudokuRepository repository;
@@ -19,11 +20,6 @@ public class LoadSudokuInteractor implements LoadSudokuInputBoundary {
         this.repository = repository;
         this.presenter = presenter;
         this.gameDataAccess = gameDataAccess;
-    }
-
-    public LoadSudokuInteractor(SudokuRepository repository,
-                                LoadSudokuOutputBoundary presenter) {
-        this(repository, presenter, null);
     }
 
     public void saveCurrentGameState(int[][] currentBoard) {
@@ -46,6 +42,27 @@ public class LoadSudokuInteractor implements LoadSudokuInputBoundary {
         gameDataAccess.save(updated);
     }
 
+    public void resumeLastGame() {
+        if (gameDataAccess == null) {
+            presenter.presentError("No persistence available.");
+            return;
+        }
+
+        List<Game> games = gameDataAccess.listAll();
+        if (games.isEmpty()) {
+            presenter.presentError("No saved games found.");
+            return;
+        }
+
+        // Most recent game
+        Game last = games.get(0);
+
+        this.currentGameId = last.getId();
+        this.currentDifficulty = last.getDifficulty();
+        this.currentMode = last.getMode();
+
+        presenter.presentLoadedBoard(last.getBoard());
+    }
 
     public void execute(LoadSudokuInputData request) {
         try {

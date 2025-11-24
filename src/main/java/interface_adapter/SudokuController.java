@@ -18,4 +18,9 @@ public class SudokuController {
     public void saveGame(int[][] currentBoard) {
         interactor.saveCurrentGameState(currentBoard);
     }
+
+    public void resumeLastGame() {
+        interactor.resumeLastGame();
+    }
+
 }
