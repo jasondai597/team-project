@@ -29,6 +29,9 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
     private final hintController hint;
     private final processController process;
     private final CheckController check;
+    private CardLayout cardLayout;
+    private JPanel cardContainer;
+
     public unRankedSudokuBoardView(SudokuBoardViewModel viewModel, SudokuController controller
             , hintController hintController, processController process, CheckController check) {
         this.viewModel = viewModel;
@@ -126,6 +129,11 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
 
     }
 
+    public void setCardContext(CardLayout layout, JPanel container) {
+        this.cardLayout = layout;
+        this.cardContainer = container;
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         String event = e.getActionCommand();
@@ -148,8 +156,11 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
                 );
 
                 if (result == JOptionPane.YES_OPTION) {
-                    //This is temporary until we add the controllers to switch to mainView
-                    JOptionPane.showMessageDialog(this, "You forfeited the game!");
+                    if (cardLayout != null && cardContainer != null) {
+                        cardLayout.show(cardContainer, "forfeit");
+                    } else {
+                        JOptionPane.showMessageDialog(this, "You forfeited the game!");
+                    }
                 }
                 break;
 

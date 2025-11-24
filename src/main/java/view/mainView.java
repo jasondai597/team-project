@@ -161,10 +161,24 @@ public class mainView extends JPanel implements ActionListener, PropertyChangeLi
             interface_adapter.CheckController check = new interface_adapter.CheckController(checkInteractor);
 
             unRankedSudokuBoardView unranked = new unRankedSudokuBoardView(viewModel, controller, hint, processController, check);
+            unranked.setCardContext(cards, container);
             container.add(unranked, "unranked");
 
             rankedSudokuBoardView ranked = new rankedSudokuBoardView(viewModel, controller, hint, processController, check);
+            ranked.setCardContext(cards, container);
             container.add(ranked, "ranked");
+
+            // Create a dummy game for forfeit view
+            int[][] dummyBoard = new int[9][9];
+            entity.Game forfeitGame = new entity.Game(
+                    "GAME_" + System.currentTimeMillis(),
+                    dummyBoard,
+                    "easy",
+                    "CASUAL",
+                    0
+            );
+            ForfeitView forfeitView = new ForfeitView(frame, forfeitGame, cards, container);
+            container.add(forfeitView, "forfeit");
         });
     }
 
