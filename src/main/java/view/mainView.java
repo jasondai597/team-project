@@ -10,7 +10,6 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-
 public class mainView extends JPanel implements ActionListener, PropertyChangeListener {
 
     private final String viewName = "main";
@@ -19,6 +18,7 @@ public class mainView extends JPanel implements ActionListener, PropertyChangeLi
 
     private JButton playButton;
     private JButton rankedButton;
+    private JButton resumeButton;
     private JButton loginButton;
 
     public mainView(ViewManagerModel viewManagerModel, SudokuController sudokuController) {
@@ -34,28 +34,37 @@ public class mainView extends JPanel implements ActionListener, PropertyChangeLi
         add(title, BorderLayout.NORTH);
 
         JPanel centerPanel = new JPanel();
-        centerPanel.setLayout(new GridLayout(2, 1, 0, 20));
+        centerPanel.setLayout(new GridLayout(3, 1, 0, 20));
         centerPanel.setBorder(BorderFactory.createEmptyBorder(20, 100, 20, 100));
         centerPanel.setBackground(Color.WHITE);
 
+        //  Play New Game
         playButton = new JButton("Play");
         playButton.setActionCommand("PLAY");
         playButton.addActionListener(this);
 
+        //  Resume Game
+        resumeButton = new JButton("Resume Last Game");
+        resumeButton.setActionCommand("RESUME");
+        resumeButton.addActionListener(this);
+        centerPanel.add(resumeButton);
+
+        //  Ranked (disabled)
         rankedButton = new JButton("Ranked");
         rankedButton.setActionCommand("RANKED");
         rankedButton.addActionListener(this);
-
         rankedButton.setOpaque(true);
         rankedButton.setBackground(new Color(196,196,196));
         rankedButton.setForeground(new Color(150,150,150));
         rankedButton.setFocusPainted(false);
 
         centerPanel.add(playButton);
+        centerPanel.add(resumeButton);
         centerPanel.add(rankedButton);
 
         add(centerPanel, BorderLayout.CENTER);
 
+        //  Login Button
         loginButton = new JButton("Login");
         loginButton.setActionCommand("LOGIN");
         loginButton.addActionListener(this);
@@ -68,21 +77,24 @@ public class mainView extends JPanel implements ActionListener, PropertyChangeLi
         add(bottomPanel, BorderLayout.SOUTH);
     }
 
-
     @Override
     public void actionPerformed(ActionEvent evt) {
         String cmd = evt.getActionCommand();
 
         switch (cmd) {
             case "PLAY":
-                // Load a new puzzle for unranked mode
                 sudokuController.loadPuzzle("easy");
                 viewManagerModel.setState("unranked");
                 viewManagerModel.firePropertyChange();
                 break;
 
+            case "RESUME":
+                sudokuController.resumeLastGame();
+                viewManagerModel.setState("unranked");
+                viewManagerModel.firePropertyChange();
+                break;
+
             case "RANKED":
-                // Load a new puzzle for ranked mode
                 sudokuController.loadPuzzle("easy");
                 viewManagerModel.setState("ranked");
                 viewManagerModel.firePropertyChange();
@@ -101,5 +113,4 @@ public class mainView extends JPanel implements ActionListener, PropertyChangeLi
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
     }
-
 }
