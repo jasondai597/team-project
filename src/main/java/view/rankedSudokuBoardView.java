@@ -1,8 +1,6 @@
 package view;
 
-import entity.SudokuPuzzle;
 import interface_adapter.*;
-import use_case.processUserMoves.ProcessInputData;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,24 +18,25 @@ public class rankedSudokuBoardView extends JPanel implements ActionListener, Pro
     private final hintController hint;
     private final processController process;
     private final CheckController check;
-    private CardLayout cardLayout;
-    private JPanel cardContainer;
+    private final ForfeitController forfeitController;
 
     // Backwards-compatible no-arg constructor shows an empty board for quick tests
     public rankedSudokuBoardView() {
-        this(null, null, null, null, null);
+        this(null, null, null, null, null, null);
     }
 
     public rankedSudokuBoardView(SudokuBoardViewModel viewModel,
                                  SudokuController controller,
                                  hintController hint,
                                  processController process,
-                                 CheckController check) {
+                                 CheckController check,
+                                 ForfeitController forfeitController) {
         this.viewModel = viewModel;
         this.controller = controller;
         this.hint = hint;
         this.process = process;
         this.check = check;
+        this.forfeitController = forfeitController;
 
         setLayout(new BorderLayout());
 
@@ -78,8 +77,7 @@ public class rankedSudokuBoardView extends JPanel implements ActionListener, Pro
                         try {
                             String text = tf.getText();
                             int value = text.isEmpty() ? 0 : Integer.parseInt(text);
-                            ProcessInputData inputData = new ProcessInputData(fr, fc, value);
-                            process.processMove(inputData);
+                            process.processMove(fr, fc, value);
                         } catch (NumberFormatException ex) {
                             tf.setText("");
                         }
@@ -166,11 +164,7 @@ public class rankedSudokuBoardView extends JPanel implements ActionListener, Pro
             );
 
             if (result == JOptionPane.YES_OPTION) {
-                if (cardLayout != null && cardContainer != null) {
-                    cardLayout.show(cardContainer, "forfeit");
-                } else {
-                    JOptionPane.showMessageDialog(this, "You forfeited the game!");
-                }
+                forfeitController.showForfeit();
             }
         }
     }
@@ -192,49 +186,6 @@ public class rankedSudokuBoardView extends JPanel implements ActionListener, Pro
             String message = (String) evt.getNewValue();
             JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
         }
-    }
-
-    // Demo main that wires existing modules and shows the ranked board
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            // reuse wiring from unRanked main but adapt for ranked
-            API.SudokuApiClient apiClient = new API.SudokuApiClient();
-            data_access.SudokuRepositoryImpl repo = new data_access.SudokuRepositoryImpl(apiClient);
-
-            interface_adapter.SudokuBoardViewModel viewModel = new interface_adapter.SudokuBoardViewModel();
-            interface_adapter.SudokuPresenter presenter = new interface_adapter.SudokuPresenter(viewModel);
-
-            use_case.game.GameDataAccess gameDataAccess = new data_access.InMemoryGameDataAccess();
-            use_case.LoadingSudoku.LoadSudokuInteractor interactor = new use_case.LoadingSudoku.LoadSudokuInteractor(repo, presenter, gameDataAccess);
-            interface_adapter.SudokuController controller = new interface_adapter.SudokuController(interactor);
-
-            // hint/check/process wiring (similar to unranked)
-            interface_adapter.HintPresenter hintPresenter = new interface_adapter.HintPresenter(viewModel);
-            use_case.hints.HintInteractor hintinteractor = new use_case.hints.HintInteractor(hintPresenter);
-            interface_adapter.hintController hint = new interface_adapter.hintController(hintinteractor);
-
-            // load puzzle first
-            controller.loadPuzzle("easy");
-
-            // create process/check controllers after puzzle is available
-            entity.SudokuPuzzle puzzle = interactor.getCurrentPuzzle();
-            interface_adapter.processPresenter processPresenter = new interface_adapter.processPresenter(viewModel);
-            use_case.processUserMoves.ProcessInteractor processInteractor = new use_case.processUserMoves.ProcessInteractor(puzzle, processPresenter);
-            interface_adapter.processController processController = new interface_adapter.processController(processInteractor);
-
-            interface_adapter.CheckPresenter checkPresenter = new interface_adapter.CheckPresenter(viewModel);
-            use_case.Check.CheckInteractor checkInteractor = new use_case.Check.CheckInteractor(checkPresenter);
-            interface_adapter.CheckController check = new interface_adapter.CheckController(checkInteractor);
-
-            rankedSudokuBoardView view = new rankedSudokuBoardView(viewModel, controller, hint, processController, check);
-
-            JFrame frame = new JFrame("ranked Sudoku Board Test");
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setSize(900, 900);
-            frame.setLayout(new BorderLayout());
-            frame.add(view, BorderLayout.CENTER);
-            frame.setVisible(true);
-        });
     }
 
 }

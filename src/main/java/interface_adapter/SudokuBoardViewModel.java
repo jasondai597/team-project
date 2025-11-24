@@ -59,6 +59,14 @@ public class SudokuBoardViewModel {
         support.firePropertyChange("incorrect", old, this.incorrectCells);
     }
 
+    /**
+     * Clears all incorrect cell highlighting.
+     */
+    public void clearIncorrectCells() {
+        boolean[][] cleared = new boolean[9][9];
+        setIncorrectCells(cleared);
+    }
+
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         support.addPropertyChangeListener(listener);
     }
