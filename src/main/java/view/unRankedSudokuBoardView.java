@@ -117,11 +117,6 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
 
     }
 
-    public void setCardContext(CardLayout layout, JPanel container) {
-        this.cardLayout = layout;
-        this.cardContainer = container;
-    }
-
     @Override
     public void actionPerformed(ActionEvent e) {
         String event = e.getActionCommand();
