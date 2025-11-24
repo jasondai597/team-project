@@ -1,13 +1,16 @@
 package interface_adapter;
 
 import use_case.LoadingSudoku.LoadSudokuInputBoundary;
-import use_case.LoadingSudoku.LoadSudokuInteractor;
 import use_case.LoadingSudoku.LoadSudokuInputData;
 
+/**
+ * Thin controller delegating Sudoku actions to the LoadSudoku use case.
+ */
 public class SudokuController {
+
     private final LoadSudokuInputBoundary interactor;
 
-    public SudokuController(LoadSudokuInteractor interactor) {
+    public SudokuController(LoadSudokuInputBoundary interactor) {
         this.interactor = interactor;
     }
 
@@ -22,5 +25,4 @@ public class SudokuController {
     public void resumeLastGame() {
         interactor.resumeLastGame();
     }
-
 }
