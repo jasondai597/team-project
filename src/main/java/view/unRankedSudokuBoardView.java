@@ -1,18 +1,6 @@
 package view;
 
-import API.SudokuApiClient;
-import data_access.SudokuRepositoryImpl;
-import entity.SudokuPuzzle;
 import interface_adapter.*;
-import use_case.Check.CheckInteractor;
-import use_case.LoadingSudoku.LoadSudokuInteractor;
-import use_case.hints.HintInteractor;
-import use_case.processUserMoves.ProcessInputData;
-import use_case.processUserMoves.ProcessInteractor;
-//Added data_access feature
-import data_access.InMemoryGameDataAccess;
-import use_case.game.GameDataAccess;
-
 
 import javax.swing.*;
 import java.awt.*;
@@ -29,13 +17,17 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
     private final hintController hint;
     private final processController process;
     private final CheckController check;
-    public unRankedSudokuBoardView(SudokuBoardViewModel viewModel, SudokuController controller
-            , hintController hintController, processController process, CheckController check) {
+    private final ForfeitController forfeitController;
+
+    public unRankedSudokuBoardView(SudokuBoardViewModel viewModel, SudokuController controller,
+            hintController hintController, processController process, CheckController check,
+            ForfeitController forfeitController) {
         this.viewModel = viewModel;
         this.controller = controller;
         this.hint = hintController;
         this.process = process;
         this.check = check;
+        this.forfeitController = forfeitController;
         setLayout(new BorderLayout());
         viewModel.addPropertyChangeListener(this);
 
@@ -76,8 +68,7 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
                     try {
                         String text = tf.getText();
                         int value = text.isEmpty() ? 0 : Integer.parseInt(text);
-                        ProcessInputData inputData = new ProcessInputData(finalR, finalC, value);
-                        process.processMove(inputData);
+                        process.processMove(finalR, finalC, value);
                     } catch (NumberFormatException ex) {
                         tf.setText("");
                     }
@@ -156,6 +147,7 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
                     System.out.println("Saved game on quit!");
 
                     JOptionPane.showMessageDialog(this, "You forfeited the game! Progress saved.");
+                    forfeitController.showForfeit();
                 }
                 break;
 
@@ -230,50 +222,4 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
             }
         }
     }
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-
-            SudokuApiClient apiClient = new SudokuApiClient();
-            SudokuRepositoryImpl repo = new SudokuRepositoryImpl(apiClient);
-
-            SudokuBoardViewModel viewModel = new SudokuBoardViewModel();
-            SudokuPresenter presenter = new SudokuPresenter(viewModel);
-
-            GameDataAccess gameDataAccess = new InMemoryGameDataAccess();
-            LoadSudokuInteractor interactor = new LoadSudokuInteractor(repo, presenter, gameDataAccess);
-            SudokuController controller = new SudokuController(interactor);
-
-            HintPresenter hintPresenter = new HintPresenter(viewModel);
-            HintInteractor hintinteractor = new HintInteractor(hintPresenter);
-            hintController hint = new hintController(hintinteractor);
-
-            controller.loadPuzzle("easy");
-            //testing if the Game is stored
-            System.out.println("Number of games stored: " + gameDataAccess.listAll().size());
-            if (!gameDataAccess.listAll().isEmpty()) {
-                System.out.println("First game id: " + gameDataAccess.listAll().get(0).getId());
-                System.out.println("First game difficulty: " + gameDataAccess.listAll().get(0).getDifficulty());
-            }
-
-
-            SudokuPuzzle puzzle = interactor.getCurrentPuzzle();
-            processPresenter processPresenter = new processPresenter(viewModel);
-            ProcessInteractor processInteractor = new ProcessInteractor(puzzle, processPresenter);
-            processController processController = new processController(processInteractor);
-
-            CheckPresenter checkPresenter = new CheckPresenter(viewModel);
-            CheckInteractor checkInteractor = new CheckInteractor(checkPresenter);
-            CheckController check = new CheckController(checkInteractor);
-
-            unRankedSudokuBoardView view =
-                    new unRankedSudokuBoardView(viewModel, controller, hint, processController, check);
-
-            JFrame frame = new JFrame("Sudoku");
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setSize(900, 900);
-            frame.add(view);
-            frame.setVisible(true);
-        });
-    }
 }
-
