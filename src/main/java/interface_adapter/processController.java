@@ -8,6 +8,11 @@ public class processController {
     public processController(ProcessInputBoundary interactor) {
         this.interactor = interactor;
     }
+
+    public void processMove(int row, int col, int value) {
+        interactor.execute(row, col, value);
+    }
+
     public void processMove(ProcessInputData inputData){
         int row = inputData.getRow();
         int col = inputData.getCol();
