@@ -26,4 +26,3 @@ public class HintInteractor implements HintInputBoundary {
         presenter.presentNoHint();
     }
 }
-
