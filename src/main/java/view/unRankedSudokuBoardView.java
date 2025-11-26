@@ -236,60 +236,60 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
             }
         }
     }
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-
-            SudokuApiClient apiClient = new SudokuApiClient();
-            SudokuRepositoryImpl repo = new SudokuRepositoryImpl(apiClient);
-
-            SudokuBoardViewModel viewModel = new SudokuBoardViewModel();
-            SudokuPresenter presenter = new SudokuPresenter(viewModel);
-
-            GameDataAccess gameDataAccess = new InMemoryGameDataAccess();
-            LoadSudokuInteractor interactor = new LoadSudokuInteractor(repo, presenter, gameDataAccess);
-            SudokuController controller = new SudokuController(interactor);
-
-            HintPresenter hintPresenter = new HintPresenter(viewModel);
-            HintInteractor hintinteractor = new HintInteractor(hintPresenter);
-            hintController hint = new hintController(hintinteractor);
-
-            controller.loadPuzzle("easy");
-            //testing if the Game is stored
-            System.out.println("Number of games stored: " + gameDataAccess.listAll().size());
-            if (!gameDataAccess.listAll().isEmpty()) {
-                System.out.println("First game id: " + gameDataAccess.listAll().get(0).getId());
-                System.out.println("First game difficulty: " + gameDataAccess.listAll().get(0).getDifficulty());
-            }
-
-
-            SudokuPuzzle puzzle = interactor.getCurrentPuzzle();
-            processPresenter processPresenter = new processPresenter(viewModel);
-            ProcessInteractor processInteractor = new ProcessInteractor(puzzle, processPresenter);
-            processController processController = new processController(processInteractor);
-
-            CheckPresenter checkPresenter = new CheckPresenter(viewModel);
-            CheckInteractor checkInteractor = new CheckInteractor(checkPresenter);
-            CheckController check = new CheckController(checkInteractor);
-
-            ViewManagerModel vm = new ViewManagerModel();
-            ForfeitController fc = new ForfeitController(vm, viewModel);
-
-            unRankedSudokuBoardView view =
-                    new unRankedSudokuBoardView(
-                            viewModel,
-                            controller,
-                            hint,
-                            processController,
-                            check,
-                            fc
-                    );
-
-            JFrame frame = new JFrame("Sudoku");
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setSize(900, 900);
-            frame.add(view);
-            frame.setVisible(true);
-        });
-    }
+//    public static void main(String[] args) {
+//        SwingUtilities.invokeLater(() -> {
+//
+//            SudokuApiClient apiClient = new SudokuApiClient();
+//            SudokuRepositoryImpl repo = new SudokuRepositoryImpl(apiClient);
+//
+//            SudokuBoardViewModel viewModel = new SudokuBoardViewModel();
+//            SudokuPresenter presenter = new SudokuPresenter(viewModel);
+//
+//            GameDataAccess gameDataAccess = new InMemoryGameDataAccess();
+//            LoadSudokuInteractor interactor = new LoadSudokuInteractor(repo, presenter, gameDataAccess);
+//            SudokuController controller = new SudokuController(interactor);
+//
+//            HintPresenter hintPresenter = new HintPresenter(viewModel);
+//            HintInteractor hintinteractor = new HintInteractor(hintPresenter);
+//            hintController hint = new hintController(hintinteractor);
+//
+//            controller.loadPuzzle("easy");
+//            //testing if the Game is stored
+//            System.out.println("Number of games stored: " + gameDataAccess.listAll().size());
+//            if (!gameDataAccess.listAll().isEmpty()) {
+//                System.out.println("First game id: " + gameDataAccess.listAll().get(0).getId());
+//                System.out.println("First game difficulty: " + gameDataAccess.listAll().get(0).getDifficulty());
+//            }
+//
+//
+//            SudokuPuzzle puzzle = interactor.getCurrentPuzzle();
+//            processPresenter processPresenter = new processPresenter(viewModel);
+//            ProcessInteractor processInteractor = new ProcessInteractor(puzzle, processPresenter);
+//            processController processController = new processController(processInteractor);
+//
+//            CheckPresenter checkPresenter = new CheckPresenter(viewModel);
+//            CheckInteractor checkInteractor = new CheckInteractor(checkPresenter);
+//            CheckController check = new CheckController(checkInteractor);
+//
+//            ViewManagerModel vm = new ViewManagerModel();
+//            ForfeitController fc = new ForfeitController(vm, viewModel);
+//
+//            unRankedSudokuBoardView view =
+//                    new unRankedSudokuBoardView(
+//                            viewModel,
+//                            controller,
+//                            hint,
+//                            processController,
+//                            check,
+//                            fc
+//                    );
+//
+//            JFrame frame = new JFrame("Sudoku");
+//            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//            frame.setSize(900, 900);
+//            frame.add(view);
+//            frame.setVisible(true);
+//        });
+//    }
 }
 

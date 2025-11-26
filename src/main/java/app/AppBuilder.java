@@ -128,7 +128,7 @@ public class AppBuilder {
         SudokuPresenter sudokuPresenter = new SudokuPresenter(sudokuBoardViewModel);
         HintPresenter hintPresenter = new HintPresenter(sudokuBoardViewModel);
         processPresenter processPresenterAdapter = new processPresenter(sudokuBoardViewModel);
-        CheckPresenter checkPresenter = new CheckPresenter(sudokuBoardViewModel);
+        CheckPresenter checkPresenter = new CheckPresenter(sudokuBoardViewModel, viewManagerModel);
 
         // Create Interactors (Use Cases)
         loadSudokuInteractor = new LoadSudokuInteractor(repository, sudokuPresenter, gameDataAccess);
@@ -162,6 +162,13 @@ public class AppBuilder {
         }
         forfeitViewModel = new ForfeitViewModel();
         forfeitController = new ForfeitController(viewManagerModel, sudokuBoardViewModel);
+        return this;
+    }
+
+    public AppBuilder addWinView(){
+        winView winview = new winView(viewManagerModel, sudokuBoardViewModel);
+        cardPanel.add(winview, "Win");
+
         return this;
     }
 
