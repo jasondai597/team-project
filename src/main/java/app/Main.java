@@ -24,6 +24,7 @@ public class Main {
                     .addUnrankedBoardView()
                     .addRankedBoardView()
                     .addForfeitView()
+                    .addWinView()
                     .build();
 
             // Display the application

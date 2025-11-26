@@ -56,7 +56,7 @@ public class AppBuilder {
         SudokuPresenter sudokuPresenter = new SudokuPresenter(sudokuBoardViewModel);
         HintPresenter hintPresenter = new HintPresenter(sudokuBoardViewModel);
         processPresenter processPresenterAdapter = new processPresenter(sudokuBoardViewModel);
-        CheckPresenter checkPresenter = new CheckPresenter(sudokuBoardViewModel);
+        CheckPresenter checkPresenter = new CheckPresenter(sudokuBoardViewModel, viewManagerModel);
 
         // Interactors
         loadSudokuInteractor =
