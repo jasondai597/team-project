@@ -87,8 +87,7 @@ public class mainView extends JPanel implements ActionListener, PropertyChangeLi
 
         switch (cmd) {
             case "PLAY":
-                sudokuController.loadPuzzle("easy");
-                viewManagerModel.setState("unranked");
+                viewManagerModel.setState("difficulty");
                 viewManagerModel.firePropertyChange();
                 break;
 

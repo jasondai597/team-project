@@ -127,6 +127,19 @@ public class AppBuilder {
         return this;
     }
 
+    public AppBuilder addWinView(){
+        winView winView = new winView(viewManagerModel, sudokuBoardViewModel);
+        cardPanel.add(winView, winView.getViewName());
+
+        return this;
+    }
+
+    public AppBuilder addDifficultyView(){
+        difficultyView difficultyView = new difficultyView(sudokuController, viewManagerModel);
+        cardPanel.add(difficultyView, "difficulty");
+        return this;
+    }
+
     public JFrame build() {
         JFrame frame = new JFrame("Sudoku App");
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
