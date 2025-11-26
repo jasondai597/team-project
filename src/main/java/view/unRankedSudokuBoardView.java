@@ -1,26 +1,16 @@
 package view;
 
-import API.SudokuApiClient;
-import data_access.SudokuRepositoryImpl;
-import entity.SudokuPuzzle;
 import interface_adapter.*;
-import use_case.Check.CheckInteractor;
-import use_case.LoadingSudoku.LoadSudokuInteractor;
-import use_case.hints.HintInteractor;
 import use_case.processUserMoves.ProcessInputData;
-import use_case.processUserMoves.ProcessInteractor;
-import data_access.InMemoryGameDataAccess;
-import use_case.game.GameDataAccess;
-
-
 
 import javax.swing.*;
+import javax.swing.text.DocumentFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-//Comment added to make an extra commit with notes, 67
+
 public class unRankedSudokuBoardView extends JPanel implements ActionListener, PropertyChangeListener {
 
     private final JTextField[][] cells = new JTextField[9][9];
@@ -30,18 +20,25 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
     private final ForfeitController forfeitController;
     private final processController process;
     private final CheckController check;
+    private final ViewManagerModel viewManagerModel;
+    private final String viewName = "unranked";
+
     public unRankedSudokuBoardView(SudokuBoardViewModel viewModel,
+                                   ViewManagerModel viewManagerModel,
                                    SudokuController controller,
                                    hintController hintController,
                                    processController process,
                                    CheckController check,
                                    ForfeitController forfeitController) {
+
         this.viewModel = viewModel;
+        this.viewManagerModel = viewManagerModel;
         this.controller = controller;
         this.hint = hintController;
         this.process = process;
         this.check = check;
         this.forfeitController = forfeitController;
+
         setLayout(new BorderLayout());
         viewModel.addPropertyChangeListener(this);
 
@@ -62,21 +59,21 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
                 final int finalR = r;
                 final int finalC = c;
 
-                // Add document filter to restrict input to single digit 1-9
-                ((javax.swing.text.AbstractDocument) tf.getDocument()).setDocumentFilter(new javax.swing.text.DocumentFilter() {
-                    @Override
-                    public void replace(FilterBypass fb, int offset, int length, String text, javax.swing.text.AttributeSet attrs)
-                            throws javax.swing.text.BadLocationException {
-                        if (text == null || text.isEmpty()) {
-                            super.replace(fb, offset, length, text, attrs);
-                            return;
-                        }
-                        // Only allow single digit 1-9
-                        if (text.matches("[1-9]") && fb.getDocument().getLength() - length < 1) {
-                            super.replace(fb, offset, length, text, attrs);
-                        }
-                    }
-                });
+                ((javax.swing.text.AbstractDocument) tf.getDocument())
+                        .setDocumentFilter(new DocumentFilter() {
+                            @Override
+                            public void replace(FilterBypass fb, int offset, int length,
+                                                String text, javax.swing.text.AttributeSet attrs)
+                                    throws javax.swing.text.BadLocationException {
+                                if (text == null || text.isEmpty()) {
+                                    super.replace(fb, offset, length, text, attrs);
+                                    return;
+                                }
+                                if (text.matches("[1-9]") && fb.getDocument().getLength() - length < 1) {
+                                    super.replace(fb, offset, length, text, attrs);
+                                }
+                            }
+                        });
 
                 tf.addActionListener(e -> {
                     try {
@@ -84,6 +81,7 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
                         int value = text.isEmpty() ? 0 : Integer.parseInt(text);
                         ProcessInputData inputData = new ProcessInputData(finalR, finalC, value);
                         process.processMove(inputData);
+                        controller.saveGame(viewModel.getBoard());
                     } catch (NumberFormatException ex) {
                         tf.setText("");
                     }
@@ -97,39 +95,42 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
 
                 cells[r][c] = tf;
                 grid.add(tf);
-
             }
         }
 
-        // if a puzzle was already loaded into the viewModel before this view
-        // was constructed, initialize the UI from the model now.
         int[][] current = viewModel.getBoard();
         if (current != null) {
             updateBoard(current);
         }
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
-        JButton Hint = new JButton("HINT");
-        Hint.setPreferredSize(new Dimension(200, 100));
-        Hint.addActionListener(this);
+        JButton back = new JButton("BACK");
+        back.setPreferredSize(new Dimension(200, 100));
+        back.addActionListener(this);
 
-        JButton Check = new JButton("CHECK");
-        Check.setPreferredSize(new Dimension(200, 100));
-        Check.addActionListener(this);
+        JButton hintButton = new JButton("HINT");
+        hintButton.setPreferredSize(new Dimension(200, 100));
+        hintButton.addActionListener(this);
 
-        JButton Forfeit = new JButton("FORFEIT");
-        Forfeit.setPreferredSize(new Dimension(200, 100));
-        Forfeit.addActionListener(this);
+        JButton checkButton = new JButton("CHECK");
+        checkButton.setPreferredSize(new Dimension(200, 100));
+        checkButton.addActionListener(this);
 
-        buttonPanel.add(Hint);
-        buttonPanel.add(Check);
-        buttonPanel.add(Forfeit);
+        JButton forfeitButton = new JButton("FORFEIT");
+        forfeitButton.setPreferredSize(new Dimension(200, 100));
+        forfeitButton.addActionListener(this);
+
+        buttonPanel.add(back);
+        buttonPanel.add(hintButton);
+        buttonPanel.add(checkButton);
+        buttonPanel.add(forfeitButton);
 
         add(grid, BorderLayout.CENTER);
         add(buttonPanel, BorderLayout.SOUTH);
+    }
 
-
-
+    public String getViewName() {
+        return viewName;
     }
 
     @Override
@@ -140,10 +141,16 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
             case "HINT":
                 hint.hint(viewModel.getBoard(), viewModel.getSolution());
                 break;
+
             case "CHECK":
                 check.check(viewModel.getBoard(), viewModel.getSolution());
-
                 break;
+
+            case "BACK":
+                viewManagerModel.setState("main");
+                viewManagerModel.firePropertyChange();
+                break;
+
             case "FORFEIT":
                 int result = JOptionPane.showConfirmDialog(
                         this,
@@ -152,70 +159,44 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
                         JOptionPane.YES_NO_OPTION,
                         JOptionPane.WARNING_MESSAGE
                 );
-
                 if (result == JOptionPane.YES_OPTION) {
-
-                    int[][] currentBoard = viewModel.getBoard();
-
-                    controller.saveGame(currentBoard);
-
+                    controller.saveGame(viewModel.getBoard());
                     System.out.println("Saved game on quit!");
-
-                    JOptionPane.showMessageDialog(this, "You forfeited the game! Progress saved.");
+                    JOptionPane.showMessageDialog(this,
+                            "You forfeited the game! Progress saved.");
                 }
                 break;
-
-
         }
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if ("board".equals(evt.getPropertyName())) {
+        switch (evt.getPropertyName()) {
+            case "board":
+                int[][] board = (int[][]) evt.getNewValue();
+                updateBoard(board);
+                break;
 
-            int[][] board = (int[][]) evt.getNewValue();
-            int[][] initial = viewModel.getInitialBoard();
-            for (int r = 0; r < 9; r++) {
-                for (int c = 0; c < 9; c++) {
-
-                    JTextField tf = cells[r][c];
-                    int val = board[r][c];
-
-                    tf.setText(val == 0 ? "" : String.valueOf(val));
-
-                    if (initial[r][c] != 0) {
-                        tf.setEditable(false);
-                        tf.setBackground(new Color(230,230,230));
-                    } else {
-                        tf.setEditable(true);
-                        tf.setBackground(Color.WHITE);
+            case "incorrect":
+                boolean[][] incorrect = (boolean[][]) evt.getNewValue();
+                for (int r = 0; r < 9; r++) {
+                    for (int c = 0; c < 9; c++) {
+                        JTextField tf = cells[r][c];
+                        if (incorrect[r][c]) {
+                            tf.setBackground(Color.RED);
+                        } else {
+                            tf.setBackground(Color.WHITE);
+                        }
                     }
                 }
-            }
+                break;
+
+            case "error":
+                String message = (String) evt.getNewValue();
+                JOptionPane.showMessageDialog(this, message,
+                        "Error", JOptionPane.ERROR_MESSAGE);
+                break;
         }
-        else if ("incorrect".equals(evt.getPropertyName())) {
-            boolean[][] incorrect = (boolean[][]) evt.getNewValue();
-            int[][] initial = viewModel.getInitialBoard();
-
-            for(int r = 0; r < 9; r++){
-                for(int c = 0; c < 9; c++){
-                    JTextField tf = cells[r][c];
-                    if(incorrect[r][c]){
-                        tf.setBackground(Color.RED);
-                    }
-                    else{
-                        tf.setBackground(Color.GREEN);
-                    }
-                }
-            }
-
-        }
-        else if ("error".equals(evt.getPropertyName())) {
-            String message = (String) evt.getNewValue();
-            JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
-        }
-
-
     }
 
     private void updateBoard(int[][] board) {
@@ -228,7 +209,7 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
 
                 if (initial != null && initial[r][c] != 0) {
                     tf.setEditable(false);
-                    tf.setBackground(new Color(230,230,230));
+                    tf.setBackground(new Color(230, 230, 230));
                 } else {
                     tf.setEditable(true);
                     tf.setBackground(Color.WHITE);
@@ -236,60 +217,4 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
             }
         }
     }
-//    public static void main(String[] args) {
-//        SwingUtilities.invokeLater(() -> {
-//
-//            SudokuApiClient apiClient = new SudokuApiClient();
-//            SudokuRepositoryImpl repo = new SudokuRepositoryImpl(apiClient);
-//
-//            SudokuBoardViewModel viewModel = new SudokuBoardViewModel();
-//            SudokuPresenter presenter = new SudokuPresenter(viewModel);
-//
-//            GameDataAccess gameDataAccess = new InMemoryGameDataAccess();
-//            LoadSudokuInteractor interactor = new LoadSudokuInteractor(repo, presenter, gameDataAccess);
-//            SudokuController controller = new SudokuController(interactor);
-//
-//            HintPresenter hintPresenter = new HintPresenter(viewModel);
-//            HintInteractor hintinteractor = new HintInteractor(hintPresenter);
-//            hintController hint = new hintController(hintinteractor);
-//
-//            controller.loadPuzzle("easy");
-//            //testing if the Game is stored
-//            System.out.println("Number of games stored: " + gameDataAccess.listAll().size());
-//            if (!gameDataAccess.listAll().isEmpty()) {
-//                System.out.println("First game id: " + gameDataAccess.listAll().get(0).getId());
-//                System.out.println("First game difficulty: " + gameDataAccess.listAll().get(0).getDifficulty());
-//            }
-//
-//
-//            SudokuPuzzle puzzle = interactor.getCurrentPuzzle();
-//            processPresenter processPresenter = new processPresenter(viewModel);
-//            ProcessInteractor processInteractor = new ProcessInteractor(puzzle, processPresenter);
-//            processController processController = new processController(processInteractor);
-//
-//            CheckPresenter checkPresenter = new CheckPresenter(viewModel);
-//            CheckInteractor checkInteractor = new CheckInteractor(checkPresenter);
-//            CheckController check = new CheckController(checkInteractor);
-//
-//            ViewManagerModel vm = new ViewManagerModel();
-//            ForfeitController fc = new ForfeitController(vm, viewModel);
-//
-//            unRankedSudokuBoardView view =
-//                    new unRankedSudokuBoardView(
-//                            viewModel,
-//                            controller,
-//                            hint,
-//                            processController,
-//                            check,
-//                            fc
-//                    );
-//
-//            JFrame frame = new JFrame("Sudoku");
-//            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//            frame.setSize(900, 900);
-//            frame.add(view);
-//            frame.setVisible(true);
-//        });
-//    }
 }
-

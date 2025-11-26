@@ -4,21 +4,20 @@ import entity.SudokuPuzzle;
 import use_case.LoadingSudoku.LoadSudokuOutputBoundary;
 
 public class SudokuPresenter implements LoadSudokuOutputBoundary {
+
     private final SudokuBoardViewModel viewModel;
+
     public SudokuPresenter(SudokuBoardViewModel viewModel) {
         this.viewModel = viewModel;
     }
 
     @Override
     public void present(SudokuPuzzle puzzle) {
-        viewModel.setInitialBoard(puzzle.getStartingBoard());
-       viewModel.setBoard(puzzle.getInitial());
-       viewModel.setSolution(puzzle.getSolution());
-
-    }
-    @Override
-    public void presentError(String message) {
-        viewModel.setErrorMessage(message);
+        // show the new puzzle
+        viewModel.setInitialBoard(puzzle.getInitial());
+        viewModel.setBoard(puzzle.getInitial());
+        viewModel.setSolution(puzzle.getSolution());
+        viewModel.clearIncorrectCells();
     }
 
     @Override
@@ -27,4 +26,8 @@ public class SudokuPresenter implements LoadSudokuOutputBoundary {
         viewModel.firePropertyChange("board", null, board);
     }
 
+    @Override
+    public void presentError(String message) {
+        viewModel.setErrorMessage(message);
+    }
 }

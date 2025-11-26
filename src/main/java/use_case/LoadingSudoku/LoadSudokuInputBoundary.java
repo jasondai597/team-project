@@ -3,7 +3,7 @@ package use_case.LoadingSudoku;
 import use_case.hints.hintInputData;
 
 public interface LoadSudokuInputBoundary {
-    void execute(LoadSudokuInputData request);
+    void execute(LoadSudokuInputData loadSudokuInputData);
 
     void saveCurrentGameState(int[][] currentBoard);
 
