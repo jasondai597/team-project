@@ -21,6 +21,7 @@ public class Main {
                     .addSudokuUseCase()
                     .addForfeitUseCase()
                     .addMainView()
+                    .addDifficultyView()
                     .addUnrankedBoardView()
                     .addRankedBoardView()
                     .addForfeitView()
