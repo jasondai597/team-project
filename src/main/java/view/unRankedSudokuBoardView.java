@@ -164,6 +164,8 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
                     System.out.println("Saved game on quit!");
                     JOptionPane.showMessageDialog(this,
                             "You forfeited the game! Progress saved.");
+                    viewManagerModel.setState("main");
+                    viewManagerModel.firePropertyChange();
                 }
                 break;
         }
