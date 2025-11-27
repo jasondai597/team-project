@@ -17,8 +17,8 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
     private final SudokuBoardViewModel viewModel;
     private final SudokuController controller;
     private final hintController hint;
-    private final ForfeitController forfeitController;
-    private final processController process;
+//    private final ForfeitController forfeitController;
+//    private final processController process;
     private final CheckController check;
     private final ViewManagerModel viewManagerModel;
     private final String viewName = "unranked";
@@ -164,6 +164,8 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
                     System.out.println("Saved game on quit!");
                     JOptionPane.showMessageDialog(this,
                             "You forfeited the game! Progress saved.");
+                    viewManagerModel.setState("main");
+                    viewManagerModel.firePropertyChange();
                 }
                 break;
         }
