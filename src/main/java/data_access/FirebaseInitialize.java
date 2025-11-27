@@ -5,8 +5,7 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.database.FirebaseDatabase;
 
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.InputStream;
 
 public class FirebaseInitialize {
 
@@ -16,8 +15,15 @@ public class FirebaseInitialize {
         if (initialized) return;
 
         try {
-            FileInputStream serviceAccount =
-                    new FileInputStream("src/main/java/data_access/firebaseService.json");
+            InputStream serviceAccount =
+                    FirebaseInitialize.class.getClassLoader()
+                            .getResourceAsStream("firebaseService.json");
+
+            if (serviceAccount == null) {
+                throw new RuntimeException(
+                        "firebaseService.json NOT FOUND in src/main/resources/"
+                );
+            }
 
             FirebaseOptions options = FirebaseOptions.builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
@@ -27,8 +33,8 @@ public class FirebaseInitialize {
             FirebaseApp.initializeApp(options);
             initialized = true;
 
-            System.out.println("Firebase initialized.");
-        } catch (IOException e) {
+            System.out.println("🔥 Firebase initialized successfully!");
+        } catch (Exception e) {
             throw new RuntimeException("Firebase init error: " + e.getMessage());
         }
     }

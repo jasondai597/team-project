@@ -27,7 +27,6 @@ public class InMemoryGameDataAccess implements GameDataAccess {
 
     @Override
     public List<Game> listAll() {
-        // later: filter by user; for now, return all games
         return new ArrayList<>(store.values());
     }
 }
