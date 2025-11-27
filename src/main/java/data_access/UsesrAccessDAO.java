@@ -45,4 +45,8 @@ public class UsesrAccessDAO {
         }
         return exist;
     }
+
+    // TODO create a fetch user data method that fetches the user data returns it as a user entity
+    // TODO create a method that updates the user data
+    // TODO optional, maybe overload the adduser function to be able to add more than just username and password
 }
