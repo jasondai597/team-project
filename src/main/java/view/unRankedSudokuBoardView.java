@@ -15,17 +15,22 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
 
     private final JTextField[][] cells = new JTextField[9][9];
     private final SudokuBoardViewModel viewModel;
+    private final ViewManagerModel viewManagerModel;
+
+    // Controllers
     private final SudokuController controller;
+    private final SaveGameController saveController; // NEW
     private final hintController hint;
-    private final ForfeitController forfeitController;
     private final processController process;
     private final CheckController check;
-    private final ViewManagerModel viewManagerModel;
+    private final ForfeitController forfeitController;
+
     private final String viewName = "unranked";
 
     public unRankedSudokuBoardView(SudokuBoardViewModel viewModel,
                                    ViewManagerModel viewManagerModel,
                                    SudokuController controller,
+                                   SaveGameController saveController, // NEW
                                    hintController hintController,
                                    processController process,
                                    CheckController check,
@@ -34,6 +39,7 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
         this.viewModel = viewModel;
         this.viewManagerModel = viewManagerModel;
         this.controller = controller;
+        this.saveController = saveController;
         this.hint = hintController;
         this.process = process;
         this.check = check;
@@ -49,6 +55,7 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
         JPanel grid = new JPanel(new GridLayout(9, 9));
         grid.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
+        // --- GRID GENERATION ---
         for (int r = 0; r < 9; r++) {
             for (int c = 0; c < 9; c++) {
                 JTextField tf = new JTextField();
@@ -75,13 +82,14 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
                             }
                         });
 
+                // Move Processing
                 tf.addActionListener(e -> {
                     try {
                         String text = tf.getText();
                         int value = text.isEmpty() ? 0 : Integer.parseInt(text);
                         ProcessInputData inputData = new ProcessInputData(finalR, finalC, value);
                         process.processMove(inputData);
-                        controller.saveGame(viewModel.getBoard());
+                        // REMOVED auto-save here
                     } catch (NumberFormatException ex) {
                         tf.setText("");
                     }
@@ -104,23 +112,29 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
         }
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+
         JButton back = new JButton("BACK");
-        back.setPreferredSize(new Dimension(200, 100));
+        back.setPreferredSize(new Dimension(120, 50));
         back.addActionListener(this);
 
+        JButton saveButton = new JButton("SAVE"); // NEW BUTTON
+        saveButton.setPreferredSize(new Dimension(120, 50));
+        saveButton.addActionListener(this);
+
         JButton hintButton = new JButton("HINT");
-        hintButton.setPreferredSize(new Dimension(200, 100));
+        hintButton.setPreferredSize(new Dimension(120, 50));
         hintButton.addActionListener(this);
 
         JButton checkButton = new JButton("CHECK");
-        checkButton.setPreferredSize(new Dimension(200, 100));
+        checkButton.setPreferredSize(new Dimension(120, 50));
         checkButton.addActionListener(this);
 
         JButton forfeitButton = new JButton("FORFEIT");
-        forfeitButton.setPreferredSize(new Dimension(200, 100));
+        forfeitButton.setPreferredSize(new Dimension(120, 50));
         forfeitButton.addActionListener(this);
 
         buttonPanel.add(back);
+        buttonPanel.add(saveButton); // Add to panel
         buttonPanel.add(hintButton);
         buttonPanel.add(checkButton);
         buttonPanel.add(forfeitButton);
@@ -146,7 +160,17 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
                 check.check(viewModel.getBoard(), viewModel.getSolution());
                 break;
 
+            case "SAVE": // NEW CASE
+                String gameId = viewModel.getGameId();
+                if (gameId == null || gameId.isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "Error: No Game ID found to save.", "Save Error", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    saveController.save(gameId, viewModel.getBoard());
+                }
+                break;
+
             case "BACK":
+                // Just navigate, DO NOT SAVE
                 viewManagerModel.setState("main");
                 viewManagerModel.firePropertyChange();
                 break;
@@ -154,18 +178,14 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
             case "FORFEIT":
                 int result = JOptionPane.showConfirmDialog(
                         this,
-                        "Are you sure you want to forfeit?",
+                        "Are you sure you want to forfeit? (Progress will NOT be saved)",
                         "Confirm Forfeit",
                         JOptionPane.YES_NO_OPTION,
                         JOptionPane.WARNING_MESSAGE
                 );
                 if (result == JOptionPane.YES_OPTION) {
-                    controller.saveGame(viewModel.getBoard());
-                    System.out.println("Saved game on quit!");
-                    JOptionPane.showMessageDialog(this,
-                            "You forfeited the game! Progress saved.");
-                    viewManagerModel.setState("main");
-                    viewManagerModel.firePropertyChange();
+                    // Just navigate, DO NOT SAVE
+                    forfeitController.showForfeit();
                 }
                 break;
         }
@@ -197,6 +217,12 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
                 String message = (String) evt.getNewValue();
                 JOptionPane.showMessageDialog(this, message,
                         "Error", JOptionPane.ERROR_MESSAGE);
+                break;
+
+            case "success": // NEW: Handle Save Success
+                String successMsg = (String) evt.getNewValue();
+                JOptionPane.showMessageDialog(this, successMsg,
+                        "Success", JOptionPane.INFORMATION_MESSAGE);
                 break;
         }
     }

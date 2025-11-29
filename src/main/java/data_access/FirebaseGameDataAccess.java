@@ -87,7 +87,6 @@ public class FirebaseGameDataAccess implements GameDataAccess {
         }
     }
 
-    // ---------- helpers ----------
 
     private List<List<Long>> boardToList(int[][] board) {
         List<List<Long>> outer = new ArrayList<>();

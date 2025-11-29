@@ -7,14 +7,19 @@ public class SudokuBoardViewModel {
 
     private final PropertyChangeSupport support = new PropertyChangeSupport(this);
 
+    private String gameId;
     private int[][] initialBoard;
     private int[][] board;
     private int[][] solution;
     private boolean[][] incorrectCells;
     private String errorMessage;
 
-    public SudokuBoardViewModel() {
-        // start with no board; views must handle nulls
+    public void setGameId(String gameId) {
+        this.gameId = gameId;
+    }
+
+    public String getGameId() {
+        return gameId;
     }
 
     public void setInitialBoard(int[][] initialBoard) {
@@ -53,6 +58,10 @@ public class SudokuBoardViewModel {
         support.firePropertyChange("error", old, message);
     }
 
+    public void setSuccessMessage(String message) {
+        support.firePropertyChange("success", null, message);
+    }
+
     public boolean[][] getIncorrectCells() {
         if (incorrectCells == null) return null;
         boolean[][] copy = new boolean[9][9];
@@ -71,7 +80,6 @@ public class SudokuBoardViewModel {
         support.firePropertyChange("incorrect", old, this.incorrectCells);
     }
 
-    /** Clears all incorrect cell highlighting. */
     public void clearIncorrectCells() {
         boolean[][] cleared = new boolean[9][9];
         setIncorrectCells(cleared);
@@ -85,7 +93,6 @@ public class SudokuBoardViewModel {
         support.firePropertyChange(propertyName, oldValue, newValue);
     }
 
-    // helper
     private int[][] copyBoard(int[][] src) {
         if (src == null) return null;
         int[][] dst = new int[src.length][];

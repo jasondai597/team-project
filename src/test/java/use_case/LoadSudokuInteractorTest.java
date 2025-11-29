@@ -44,9 +44,8 @@ class LoadSudokuInteractorTest {
         String errorMessage;
 
         @Override
-        public void present(SudokuPuzzle puzzle) {
-            presentCalled = true;
-            receivedPuzzle = puzzle;
+        public void present(SudokuPuzzle puzzle, String gameId) {
+            this.presentCalled = true;
         }
 
         @Override
@@ -57,7 +56,6 @@ class LoadSudokuInteractorTest {
 
         @Override
         public void presentLoadedBoard(int[][] board) {
-            // not used in this assignment
         }
     }
 
@@ -80,7 +78,6 @@ class LoadSudokuInteractorTest {
         return obj;
     }
 
-    // ---------- TESTS ----------
 
     @Test
     void testExecuteSuccess() {
