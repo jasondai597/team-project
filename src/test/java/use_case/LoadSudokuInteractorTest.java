@@ -46,6 +46,7 @@ class LoadSudokuInteractorTest {
         @Override
         public void present(SudokuPuzzle puzzle, String gameId) {
             this.presentCalled = true;
+            this.receivedPuzzle = puzzle;
         }
 
         @Override
@@ -88,7 +89,7 @@ class LoadSudokuInteractorTest {
         FakeGameData data = new FakeGameData();
 
         LoadSudokuInteractor interactor =
-                new LoadSudokuInteractor(repo, presenter, data);
+                new LoadSudokuInteractor(repo, presenter, data, null);
 
         LoadSudokuInputData request = new LoadSudokuInputData("medium");
         interactor.execute(request);
@@ -112,7 +113,7 @@ class LoadSudokuInteractorTest {
         FakeGameData data = new FakeGameData();
 
         LoadSudokuInteractor interactor =
-                new LoadSudokuInteractor(repo, presenter, data);
+                new LoadSudokuInteractor(repo, presenter, data, null);
 
         interactor.execute(new LoadSudokuInputData("easy"));
 
