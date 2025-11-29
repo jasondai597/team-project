@@ -9,6 +9,8 @@ import use_case.LoadingSudoku.LoadSudokuInteractor;
 import use_case.game.GameDataAccess;
 import use_case.hints.HintInteractor;
 import use_case.processUserMoves.ProcessInteractor;
+import use_case.save.SaveGameInteractor;   // NEW
+import use_case.resume.ResumeGameInteractor; // NEW
 import view.*;
 
 import javax.swing.*;
@@ -32,6 +34,9 @@ public class AppBuilder {
 
     // Controllers
     private SudokuController sudokuController;
+    private SaveGameController saveController;     // NEW
+    private ResumeGameController resumeController; // NEW
+
     private hintController hintController;
     private processController processController;
     private CheckController checkController;
@@ -58,17 +63,33 @@ public class AppBuilder {
         processPresenter processPresenterAdapter = new processPresenter(sudokuBoardViewModel);
         CheckPresenter checkPresenter = new CheckPresenter(sudokuBoardViewModel, viewManagerModel);
 
-        // Interactors
-        loadSudokuInteractor =
-                new LoadSudokuInteractor(repository, sudokuPresenter, gameDataAccess);
+        // --- INTERACTOR WIRING ---
 
+        // 1. ProcessInteractor (Must be created early to be shared)
+        ProcessInteractor processInteractor = new ProcessInteractor(null, processPresenterAdapter);
+
+        // 2. LoadSudokuInteractor (Now receives ProcessInteractor)
+        loadSudokuInteractor = new LoadSudokuInteractor(
+                repository,
+                sudokuPresenter,
+                gameDataAccess,
+                processInteractor // <== Injection
+        );
+
+        // 3. Save & Resume Interactors (New Architecture)
+        SaveGameInteractor saveInteractor = new SaveGameInteractor(gameDataAccess, sudokuBoardViewModel);
+        ResumeGameInteractor resumeInteractor = new ResumeGameInteractor(gameDataAccess, sudokuPresenter, processInteractor);
+
+        // 4. Other Interactors
         HintInteractor hintInteractor = new HintInteractor(hintPresenter);
-        ProcessInteractor processInteractor =
-                new ProcessInteractor(null, processPresenterAdapter);
         CheckInteractor checkInteractor = new CheckInteractor(checkPresenter);
 
-        // Controllers
+        // --- CONTROLLERS ---
+
         sudokuController = new SudokuController(loadSudokuInteractor);
+        saveController = new SaveGameController(saveInteractor);       // NEW
+        resumeController = new ResumeGameController(resumeInteractor); // NEW
+
         hintController = new hintController(hintInteractor);
         processController = new processController(processInteractor);
         checkController = new CheckController(checkInteractor);
@@ -86,6 +107,7 @@ public class AppBuilder {
         mainView mainViewPanel = new mainView(
                 viewManagerModel,
                 sudokuController,
+                resumeController, // <== Pass Resume Controller
                 sudokuBoardViewModel
         );
         cardPanel.add(mainViewPanel, mainViewPanel.getViewName());
@@ -98,6 +120,7 @@ public class AppBuilder {
                         sudokuBoardViewModel,
                         viewManagerModel,
                         sudokuController,
+                        saveController,   // <== Pass Save Controller
                         hintController,
                         processController,
                         checkController,

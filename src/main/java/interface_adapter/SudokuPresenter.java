@@ -12,8 +12,8 @@ public class SudokuPresenter implements LoadSudokuOutputBoundary {
     }
 
     @Override
-    public void present(SudokuPuzzle puzzle) {
-        // show the new puzzle
+    public void present(SudokuPuzzle puzzle, String gameId) {
+        viewModel.setGameId(gameId); // Update the ID
         viewModel.setInitialBoard(puzzle.getInitial());
         viewModel.setBoard(puzzle.getInitial());
         viewModel.setSolution(puzzle.getSolution());

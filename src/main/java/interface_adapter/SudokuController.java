@@ -4,7 +4,7 @@ import use_case.LoadingSudoku.LoadSudokuInputBoundary;
 import use_case.LoadingSudoku.LoadSudokuInputData;
 
 /**
- * Thin controller delegating Sudoku actions to the LoadSudoku use case.
+ * Controller responsible ONLY for loading new Sudoku puzzles.
  */
 public class SudokuController {
 
@@ -16,13 +16,5 @@ public class SudokuController {
 
     public void loadPuzzle(String difficulty) {
         interactor.execute(new LoadSudokuInputData(difficulty));
-    }
-
-    public void saveGame(int[][] currentBoard) {
-        interactor.saveCurrentGameState(currentBoard);
-    }
-
-    public void resumeLastGame() {
-        interactor.resumeLastGame();
     }
 }

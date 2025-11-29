@@ -1,5 +1,6 @@
 package view;
 
+import interface_adapter.ResumeGameController;
 import interface_adapter.SudokuBoardViewModel;
 import interface_adapter.SudokuController;
 import interface_adapter.ViewManagerModel;
@@ -16,6 +17,7 @@ public class mainView extends JPanel implements ActionListener, PropertyChangeLi
     private final String viewName = "main";
     private final ViewManagerModel viewManagerModel;
     private final SudokuController sudokuController;
+    private final ResumeGameController resumeController; // NEW
     private final SudokuBoardViewModel viewModel;
 
     private JButton playButton;
@@ -25,10 +27,12 @@ public class mainView extends JPanel implements ActionListener, PropertyChangeLi
 
     public mainView(ViewManagerModel viewManagerModel,
                     SudokuController sudokuController,
+                    ResumeGameController resumeController, // NEW
                     SudokuBoardViewModel viewModel) {
 
         this.viewManagerModel = viewManagerModel;
         this.sudokuController = sudokuController;
+        this.resumeController = resumeController;
         this.viewModel = viewModel;
 
         setLayout(new BorderLayout());
@@ -92,13 +96,18 @@ public class mainView extends JPanel implements ActionListener, PropertyChangeLi
                 break;
 
             case "RESUME":
+                // 1. Clear old highlights
                 viewModel.clearIncorrectCells();
-                sudokuController.resumeLastGame();
+                // 2. Call the dedicated Resume Controller
+                resumeController.resume();
+                // 3. Navigate (Note: ideally the Presenter handles the state switch on success,
+                //    but doing it here ensures the view switches if the data loads fast)
                 viewManagerModel.setState("unranked");
                 viewManagerModel.firePropertyChange();
                 break;
 
             case "RANKED":
+                // Note: Ranked uses the standard controller for now as it's under construction
                 sudokuController.loadPuzzle("easy");
                 viewManagerModel.setState("ranked");
                 viewManagerModel.firePropertyChange();
