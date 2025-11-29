@@ -4,19 +4,20 @@ import entity.Game;
 import entity.SudokuPuzzle;
 import org.json.JSONObject;
 import use_case.game.GameDataAccess;
-import use_case.processUserMoves.ProcessInteractor;
+import use_case.processUserMoves.ProcessInteractor; // Import ProcessInteractor
 
 public class LoadSudokuInteractor implements LoadSudokuInputBoundary {
 
     private final SudokuRepository repo;
     private final LoadSudokuOutputBoundary presenter;
     private final GameDataAccess gameDataAccess;
-    private final ProcessInteractor processInteractor; // 1. Added Dependency
+    private final ProcessInteractor processInteractor; // 1. Add field
 
+    // 2. Update Constructor to take 4 arguments
     public LoadSudokuInteractor(SudokuRepository repo,
                                 LoadSudokuOutputBoundary presenter,
                                 GameDataAccess gameDataAccess,
-                                ProcessInteractor processInteractor) { // 2. Updated Constructor
+                                ProcessInteractor processInteractor) {
         this.repo = repo;
         this.presenter = presenter;
         this.gameDataAccess = gameDataAccess;
@@ -26,33 +27,30 @@ public class LoadSudokuInteractor implements LoadSudokuInputBoundary {
     @Override
     public void execute(LoadSudokuInputData request) {
         try {
-            // 1. Fetch and Parse
             JSONObject json = repo.fetchSudokuJSON(request.getDifficulty());
+
             int[][] initial = SudokuBoardParser.parse(json.getString("puzzle"));
             int[][] solution = SudokuBoardParser.parse(json.getString("solution"));
 
-            // 2. Create Puzzle Entity
             SudokuPuzzle puzzle = new SudokuPuzzle(initial, solution, request.getDifficulty());
 
-            // 3. CRITICAL FIX: Tell the ProcessInteractor about the new puzzle
-            // This ensures the user cannot overwrite fixed numbers (the "Silent Failure" bug)
+            // 3. IMPORTANT: Tell ProcessInteractor about the new puzzle
+            // This prevents users from overwriting fixed numbers!
             if (processInteractor != null) {
                 processInteractor.setPuzzle(puzzle);
             }
 
-            // 4. Generate ID and Save Initial State (Game Creation)
-            String newGameId = gameDataAccess.generateId();
-            Game newGame = new Game(
-                    newGameId,
+            // Save new game
+            String currentGameId = gameDataAccess.generateId();
+            gameDataAccess.save(new Game(
+                    currentGameId,
                     initial,
                     request.getDifficulty(),
                     "CASUAL",
                     0L
-            );
-            gameDataAccess.save(newGame);
+            ));
 
-            // 5. Present the new game AND the ID (so we can save it later)
-            presenter.present(puzzle, newGameId);
+            presenter.present(puzzle, currentGameId);
 
         } catch (Exception e) {
             e.printStackTrace();
