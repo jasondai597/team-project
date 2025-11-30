@@ -11,19 +11,23 @@ import java.util.Map;
 //import classes from entity
 import entity.User;
 import entity.UserFactory;
+import use_case.signUp.signUpUserDataAccessInterface;
 
-public class UsesrAccessDAO {
+public class UserAccessDAO implements signUpUserDataAccessInterface {
 
     private final CollectionReference userRef;
     private final Firestore db;
 
-    public UsesrAccessDAO() {
+    public UserAccessDAO() {
         FirebaseInitialize.initFirebase();
         this.db = FirestoreClient.getFirestore();
         this.userRef = db.collection("Users");
     }
 
-    public void adduser(String username, String password) {
+    @Override
+    public void addUser(User user) {
+        String username = user.getUsername();
+        String password = user.getPassword();
         Map<String, Object> data = new java.util.HashMap<>();
         data.put("password", password);
 
@@ -37,6 +41,7 @@ public class UsesrAccessDAO {
         }
     }
 
+    @Override
     public boolean checkForUser(String username) {
         DocumentReference docRef = userRef.document(username);
         ApiFuture<DocumentSnapshot> future = docRef.get();
@@ -76,7 +81,7 @@ public class UsesrAccessDAO {
             throw new RuntimeException("User doesn't exist, or failed to communicate with firebase");
         }
     }
-    // Get user class that returns a User object based on the user
+    // Get a user class that returns a User object based on the user
     public User getUser(String username, UserFactory userFactory) {
         ApiFuture<DocumentSnapshot> future = userRef.document(username).get();
         try {
