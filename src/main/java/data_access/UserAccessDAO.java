@@ -11,9 +11,9 @@ import java.util.Map;
 //import classes from entity
 import entity.User;
 import entity.UserFactory;
-import use_case.signUp.signUpUserDataAccessInterface;
+import use_case.signUp.SignUpUserDataAccessInterface;
 
-public class UserAccessDAO implements signUpUserDataAccessInterface {
+public class UserAccessDAO implements SignUpUserDataAccessInterface {
 
     private final CollectionReference userRef;
     private final Firestore db;

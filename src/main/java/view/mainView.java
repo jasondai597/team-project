@@ -24,6 +24,7 @@ public class mainView extends JPanel implements ActionListener, PropertyChangeLi
     private JButton rankedButton;
     private JButton resumeButton;
     private JButton loginButton;
+    private JButton signUpButton;
 
     public mainView(ViewManagerModel viewManagerModel,
                     SudokuController sudokuController,
@@ -78,8 +79,14 @@ public class mainView extends JPanel implements ActionListener, PropertyChangeLi
         loginButton.setActionCommand("LOGIN");
         loginButton.addActionListener(this);
 
+        // SignUp
+        signUpButton = new JButton("Signup");
+        signUpButton.setActionCommand("SIGNUP");
+        signUpButton.addActionListener(this);
+
         JPanel bottomPanel = new JPanel();
         bottomPanel.add(loginButton);
+        bottomPanel.add(signUpButton);
         bottomPanel.setBackground(Color.WHITE);
         bottomPanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
         add(bottomPanel, BorderLayout.SOUTH);
@@ -116,6 +123,15 @@ public class mainView extends JPanel implements ActionListener, PropertyChangeLi
             case "LOGIN":
                 System.out.println("Login clicked");
                 break;
+
+            case "SIGNUP":
+                viewManagerModel.setState("signUp");
+                viewManagerModel.firePropertyChange();
+                break;
+
+            default:
+                System.out.println("Not implemented yet");
+
         }
     }
 

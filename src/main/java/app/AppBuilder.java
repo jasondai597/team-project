@@ -3,7 +3,12 @@ package app;
 import API.SudokuApiClient;
 import data_access.FirebaseGameDataAccess;
 import data_access.SudokuRepositoryImpl;
+import data_access.UserAccessDAO;
+import entity.UserFactory;
 import interface_adapter.*;
+import interface_adapter.signUp.SignUpController;
+import interface_adapter.signUp.SignUpPresenter;
+import interface_adapter.signUp.SignUpViewModel;
 import use_case.Check.CheckInteractor;
 import use_case.LoadingSudoku.LoadSudokuInteractor;
 import use_case.game.GameDataAccess;
@@ -11,6 +16,8 @@ import use_case.hints.HintInteractor;
 import use_case.processUserMoves.ProcessInteractor;
 import use_case.save.SaveGameInteractor;   // NEW
 import use_case.resume.ResumeGameInteractor; // NEW
+import use_case.signUp.SignUpInputBoundary;
+import use_case.signUp.SignUpInteractor;
 import view.*;
 
 import javax.swing.*;
@@ -23,14 +30,18 @@ public class AppBuilder {
     private final ViewManagerModel viewManagerModel = new ViewManagerModel();
     private final ViewManager viewManager = new ViewManager(cardPanel, cardLayout, viewManagerModel);
 
+    private final UserFactory userFactory = new UserFactory();
+
     // Data Access
     private SudokuApiClient apiClient;
     private SudokuRepositoryImpl repository;
     private GameDataAccess gameDataAccess;
+    private UserAccessDAO userAccessDAO;
 
     // ViewModels
     private SudokuBoardViewModel sudokuBoardViewModel;
     private ForfeitViewModel forfeitViewModel;
+    private SignUpViewModel signUpViewModel;
 
     // Controllers
     private SudokuController sudokuController;
@@ -41,6 +52,8 @@ public class AppBuilder {
     private processController processController;
     private CheckController checkController;
     private ForfeitController forfeitController;
+
+    private SignUpController signUpController;
 
     // Interactors
     private LoadSudokuInteractor loadSudokuInteractor;
@@ -54,14 +67,18 @@ public class AppBuilder {
         apiClient = new SudokuApiClient();
         repository = new SudokuRepositoryImpl(apiClient);
         gameDataAccess = new FirebaseGameDataAccess();
+        userAccessDAO = new UserAccessDAO();
 
         sudokuBoardViewModel = new SudokuBoardViewModel();
+
+        signUpViewModel = new SignUpViewModel();
 
         // Presenters
         SudokuPresenter sudokuPresenter = new SudokuPresenter(sudokuBoardViewModel);
         HintPresenter hintPresenter = new HintPresenter(sudokuBoardViewModel);
         processPresenter processPresenterAdapter = new processPresenter(sudokuBoardViewModel);
         CheckPresenter checkPresenter = new CheckPresenter(sudokuBoardViewModel, viewManagerModel);
+        SignUpPresenter signUpPresenter = new SignUpPresenter(signUpViewModel, viewManagerModel);
 
         // --- INTERACTOR WIRING ---
 
@@ -84,6 +101,9 @@ public class AppBuilder {
         HintInteractor hintInteractor = new HintInteractor(hintPresenter);
         CheckInteractor checkInteractor = new CheckInteractor(checkPresenter);
 
+        // 5. SignUp Interactor
+        SignUpInputBoundary signUpInteractor = new SignUpInteractor(userAccessDAO, signUpPresenter, userFactory);
+
         // --- CONTROLLERS ---
 
         sudokuController = new SudokuController(loadSudokuInteractor);
@@ -93,6 +113,8 @@ public class AppBuilder {
         hintController = new hintController(hintInteractor);
         processController = new processController(processInteractor);
         checkController = new CheckController(checkInteractor);
+
+        signUpController = new SignUpController(signUpInteractor, viewManagerModel);
 
         return this;
     }
@@ -160,6 +182,13 @@ public class AppBuilder {
     public AppBuilder addDifficultyView(){
         difficultyView difficultyView = new difficultyView(sudokuController, viewManagerModel);
         cardPanel.add(difficultyView, "difficulty");
+        return this;
+    }
+
+    public AppBuilder addSignUpView() {
+        signUpView signUp = new signUpView(signUpViewModel);
+        signUp.setController(signUpController);
+        cardPanel.add(signUp, signUp.getViewName());
         return this;
     }
 
