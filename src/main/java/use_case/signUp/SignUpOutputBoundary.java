@@ -15,10 +15,4 @@ public interface SignUpOutputBoundary {
      */
     void presentFailureView(String errorMessage);
 
-    /**
-     * present a logged in view if sucess
-     */
-    void presentLoggedInView();
-
-
 }
