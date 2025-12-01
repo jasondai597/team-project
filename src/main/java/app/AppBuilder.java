@@ -1,11 +1,30 @@
 package app;
 
+import java.awt.CardLayout;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.WindowConstants;
+
 import API.SudokuApiClient;
 import data_access.FirebaseGameDataAccess;
 import data_access.SudokuRepositoryImpl;
 import data_access.UserAccessDAO;
 import entity.UserFactory;
-import interface_adapter.*;
+import interface_adapter.CheckController;
+import interface_adapter.CheckPresenter;
+import interface_adapter.ForfeitController;
+import interface_adapter.ForfeitViewModel;
+import interface_adapter.HintPresenter;
+import interface_adapter.ResumeGameController;   // NEW
+import interface_adapter.SaveGameController; // NEW
+import interface_adapter.SudokuBoardViewModel;
+import interface_adapter.SudokuController;
+import interface_adapter.SudokuPresenter;
+import interface_adapter.ViewManagerModel;
+import interface_adapter.hintController;
+import interface_adapter.processController;
+import interface_adapter.processPresenter;
 import interface_adapter.signUp.SignUpController;
 import interface_adapter.signUp.SignUpPresenter;
 import interface_adapter.signUp.SignUpViewModel;
@@ -14,14 +33,18 @@ import use_case.LoadingSudoku.LoadSudokuInteractor;
 import use_case.game.GameDataAccess;
 import use_case.hints.HintInteractor;
 import use_case.processUserMoves.ProcessInteractor;
-import use_case.save.SaveGameInteractor;   // NEW
-import use_case.resume.ResumeGameInteractor; // NEW
+import use_case.resume.ResumeGameInteractor;
+import use_case.save.SaveGameInteractor;
 import use_case.signUp.SignUpInputBoundary;
 import use_case.signUp.SignUpInteractor;
-import view.*;
-
-import javax.swing.*;
-import java.awt.*;
+import view.ForfeitView;
+import view.ViewManager;
+import view.difficultyView;
+import view.mainView;
+import view.rankedSudokuBoardView;
+import view.signUpView;
+import view.unRankedSudokuBoardView;
+import view.winView;
 
 public class AppBuilder {
 
@@ -121,7 +144,18 @@ public class AppBuilder {
 
     public AppBuilder addForfeitUseCase() {
         forfeitViewModel = new ForfeitViewModel();
-        forfeitController = new ForfeitController(viewManagerModel, sudokuBoardViewModel);
+
+        // Create the presenter (output boundary)
+        interface_adapter.ForfeitPresenter forfeitPresenter =
+            new interface_adapter.ForfeitPresenter(forfeitViewModel, viewManagerModel);
+
+        // Create the interactor (input boundary)
+        use_case.forfeit.ForfeitInteractor forfeitInteractor =
+            new use_case.forfeit.ForfeitInteractor(gameDataAccess, forfeitPresenter);
+
+        // Create the controller
+        forfeitController = new ForfeitController(forfeitInteractor, forfeitPresenter, sudokuBoardViewModel);
+
         return this;
     }
 
