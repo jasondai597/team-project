@@ -5,7 +5,6 @@ import javax.swing.SwingUtilities;
 
 /**
  * Main entry point for the Sudoku application.
- * Uses AppBuilder to construct the application following Clean Architecture principles.
  */
 public class Main {
 
@@ -31,10 +30,10 @@ public class Main {
                     .addLoginView()
                     .build();
 
-            // Display the application
-            application.setSize(900, 900);
-            application.setLocationRelativeTo(null);
-            application.setVisible(true);
-        });
+        // Display the application
+        final int applicationSize = 900;
+        application.setSize(applicationSize, applicationSize);
+        application.setLocationRelativeTo(null);
+        application.setVisible(true);
     }
 }

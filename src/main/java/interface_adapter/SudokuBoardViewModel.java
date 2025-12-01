@@ -13,6 +13,9 @@ public class SudokuBoardViewModel {
     private int[][] solution;
     private boolean[][] incorrectCells;
     private String errorMessage;
+    private String difficulty;
+    private long startTime;
+    private boolean isForfeited = false;
 
     public void setGameId(String gameId) {
         this.gameId = gameId;
@@ -91,6 +94,34 @@ public class SudokuBoardViewModel {
 
     public void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
         support.firePropertyChange(propertyName, oldValue, newValue);
+    }
+
+    public void setDifficulty(String difficulty) {
+        this.difficulty = difficulty;
+    }
+
+    public String getDifficulty() {
+        return difficulty;
+    }
+
+    public void setStartTime(long startTime) {
+        this.startTime = startTime;
+    }
+
+    public long getStartTime() {
+        return startTime;
+    }
+
+    public long getElapsedTimeMs() {
+        return System.currentTimeMillis() - startTime;
+    }
+
+    public void setForfeited(boolean forfeited) {
+        this.isForfeited = forfeited;
+    }
+
+    public boolean isForfeited() {
+        return isForfeited;
     }
 
     private int[][] copyBoard(int[][] src) {

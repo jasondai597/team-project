@@ -17,6 +17,9 @@ public class SudokuPresenter implements LoadSudokuOutputBoundary {
         viewModel.setInitialBoard(puzzle.getInitial());
         viewModel.setBoard(puzzle.getInitial());
         viewModel.setSolution(puzzle.getSolution());
+        viewModel.setDifficulty(puzzle.getDifficulty());
+        viewModel.setStartTime(System.currentTimeMillis());
+        viewModel.setForfeited(false);
         viewModel.clearIncorrectCells();
     }
 
