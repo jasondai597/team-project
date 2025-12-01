@@ -16,8 +16,8 @@ import interface_adapter.CheckPresenter;
 import interface_adapter.ForfeitController;
 import interface_adapter.ForfeitViewModel;
 import interface_adapter.HintPresenter;
-import interface_adapter.ResumeGameController;   // NEW
-import interface_adapter.SaveGameController; // NEW
+import interface_adapter.ResumeGameController;
+import interface_adapter.SaveGameController;
 import interface_adapter.SudokuBoardViewModel;
 import interface_adapter.SudokuController;
 import interface_adapter.SudokuPresenter;
@@ -68,8 +68,8 @@ public class AppBuilder {
 
     // Controllers
     private SudokuController sudokuController;
-    private SaveGameController saveController;     // NEW
-    private ResumeGameController resumeController; // NEW
+    private SaveGameController saveController;
+    private ResumeGameController resumeController;
 
     private hintController hintController;
     private processController processController;
