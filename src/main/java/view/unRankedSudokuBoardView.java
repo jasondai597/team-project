@@ -1,15 +1,34 @@
 package view;
 
-import interface_adapter.*;
-import use_case.processUserMoves.ProcessInputData;
-
-import javax.swing.*;
-import javax.swing.text.DocumentFilter;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.text.DocumentFilter;
+
+import interface_adapter.CheckController;
+import interface_adapter.ForfeitController;
+import interface_adapter.SaveGameController;
+import interface_adapter.SudokuBoardViewModel;
+import interface_adapter.SudokuController;
+import interface_adapter.ViewManagerModel;
+import interface_adapter.hintController;
+import interface_adapter.processController;
+import use_case.processUserMoves.ProcessInputData;
 
 public class unRankedSudokuBoardView extends JPanel implements ActionListener, PropertyChangeListener {
 
@@ -178,7 +197,7 @@ public class unRankedSudokuBoardView extends JPanel implements ActionListener, P
             case "FORFEIT":
                 int result = JOptionPane.showConfirmDialog(
                         this,
-                        "Are you sure you want to forfeit? (Progress will NOT be saved)",
+                        "Are you sure you want to forfeit?",
                         "Confirm Forfeit",
                         JOptionPane.YES_NO_OPTION,
                         JOptionPane.WARNING_MESSAGE
