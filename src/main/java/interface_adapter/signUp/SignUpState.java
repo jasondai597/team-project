@@ -7,9 +7,7 @@ public class SignUpState {
     private String username = "";
     private String usernameError;
     private String password = "";
-    private String passwordError;
     private String repeatPassword = "";
-    private String repeatPasswordError;
 
     public String getUsername() {
         return username;
@@ -23,17 +21,10 @@ public class SignUpState {
         return password;
     }
 
-    public String getPasswordError() {
-        return passwordError;
-    }
-
     public String getRepeatPassword() {
         return repeatPassword;
     }
 
-    public String getRepeatPasswordError() {
-        return repeatPasswordError;
-    }
 
     public void setUsername(String username) {
         this.username = username;
@@ -47,17 +38,11 @@ public class SignUpState {
         this.password = password;
     }
 
-    public void setPasswordError(String passwordError) {
-        this.passwordError = passwordError;
-    }
 
     public void setRepeatPassword(String repeatPassword) {
         this.repeatPassword = repeatPassword;
     }
 
-    public void setRepeatPasswordError(String repeatPasswordError) {
-        this.repeatPasswordError = repeatPasswordError;
-    }
 
     @Override
     public String toString() {

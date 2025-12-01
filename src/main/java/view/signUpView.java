@@ -103,9 +103,7 @@ public class signUpView extends JPanel implements ActionListener, PropertyChange
         this.add(repeatPasswordField);
         this.add(buttonPanel);
 
-
     }
-
 
     @Override
     public void actionPerformed(ActionEvent evt) {
@@ -208,6 +206,7 @@ public class signUpView extends JPanel implements ActionListener, PropertyChange
             }
         });
     }
+
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         final SignUpState state = (SignUpState) evt.getNewValue();

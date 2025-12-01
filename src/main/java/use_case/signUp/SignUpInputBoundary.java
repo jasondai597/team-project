@@ -5,9 +5,8 @@ package use_case.signUp;
  */
 public interface SignUpInputBoundary {
     /**
-     * Execute the signup usecase
+     * Execute the signup usecase.
      * @param signupInputData the input data
      */
     void execute(SignUpInputData signupInputData);
-    //Deleted switch to logged in view cuz i can handle that in view
 }

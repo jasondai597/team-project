@@ -6,6 +6,10 @@ import data_access.SudokuRepositoryImpl;
 import data_access.UserAccessDAO;
 import entity.UserFactory;
 import interface_adapter.*;
+import interface_adapter.loggedIn.LoggedInViewModel;
+import interface_adapter.login.LoginController;
+import interface_adapter.login.LoginPresenter;
+import interface_adapter.login.LoginViewModel;
 import interface_adapter.signUp.SignUpController;
 import interface_adapter.signUp.SignUpPresenter;
 import interface_adapter.signUp.SignUpViewModel;
@@ -13,6 +17,8 @@ import use_case.Check.CheckInteractor;
 import use_case.LoadingSudoku.LoadSudokuInteractor;
 import use_case.game.GameDataAccess;
 import use_case.hints.HintInteractor;
+import use_case.login.LoginInputBoundary;
+import use_case.login.LoginInteractor;
 import use_case.processUserMoves.ProcessInteractor;
 import use_case.save.SaveGameInteractor;   // NEW
 import use_case.resume.ResumeGameInteractor; // NEW
@@ -42,6 +48,8 @@ public class AppBuilder {
     private SudokuBoardViewModel sudokuBoardViewModel;
     private ForfeitViewModel forfeitViewModel;
     private SignUpViewModel signUpViewModel;
+    private LoggedInViewModel loggedInViewModel;
+    private LoginViewModel loginViewModel;
 
     // Controllers
     private SudokuController sudokuController;
@@ -54,6 +62,7 @@ public class AppBuilder {
     private ForfeitController forfeitController;
 
     private SignUpController signUpController;
+    private LoginController loginController;
 
     // Interactors
     private LoadSudokuInteractor loadSudokuInteractor;
@@ -73,12 +82,17 @@ public class AppBuilder {
 
         signUpViewModel = new SignUpViewModel();
 
+        loggedInViewModel = new LoggedInViewModel();
+        loginViewModel = new LoginViewModel();
+
         // Presenters
         SudokuPresenter sudokuPresenter = new SudokuPresenter(sudokuBoardViewModel);
         HintPresenter hintPresenter = new HintPresenter(sudokuBoardViewModel);
         processPresenter processPresenterAdapter = new processPresenter(sudokuBoardViewModel);
         CheckPresenter checkPresenter = new CheckPresenter(sudokuBoardViewModel, viewManagerModel);
-        SignUpPresenter signUpPresenter = new SignUpPresenter(signUpViewModel, viewManagerModel);
+        final SignUpPresenter signUpPresenter = new SignUpPresenter(signUpViewModel, viewManagerModel,
+                loggedInViewModel);
+        final LoginPresenter loginPresenter = new LoginPresenter(loginViewModel, viewManagerModel, loggedInViewModel);
 
         // --- INTERACTOR WIRING ---
 
@@ -101,9 +115,9 @@ public class AppBuilder {
         HintInteractor hintInteractor = new HintInteractor(hintPresenter);
         CheckInteractor checkInteractor = new CheckInteractor(checkPresenter);
 
-        // 5. SignUp Interactor
+        // 5. SignUp/login Interactor
         SignUpInputBoundary signUpInteractor = new SignUpInteractor(userAccessDAO, signUpPresenter, userFactory);
-
+        LoginInputBoundary loginInteractor = new LoginInteractor(userAccessDAO, loginPresenter);
         // --- CONTROLLERS ---
 
         sudokuController = new SudokuController(loadSudokuInteractor);
@@ -115,6 +129,7 @@ public class AppBuilder {
         checkController = new CheckController(checkInteractor);
 
         signUpController = new SignUpController(signUpInteractor, viewManagerModel);
+        loginController = new LoginController(loginInteractor, viewManagerModel);
 
         return this;
     }
@@ -172,23 +187,54 @@ public class AppBuilder {
         return this;
     }
 
-    public AppBuilder addWinView(){
+    public AppBuilder addWinView() {
         winView winView = new winView(viewManagerModel, sudokuBoardViewModel);
         cardPanel.add(winView, winView.getViewName());
 
         return this;
     }
 
-    public AppBuilder addDifficultyView(){
+    public AppBuilder addDifficultyView() {
         difficultyView difficultyView = new difficultyView(sudokuController, viewManagerModel);
         cardPanel.add(difficultyView, "difficulty");
         return this;
     }
 
+    /**
+     * SignUpView builder.
+     * @return the app
+     */
     public AppBuilder addSignUpView() {
-        signUpView signUp = new signUpView(signUpViewModel);
+        final signUpView signUp = new signUpView(signUpViewModel);
         signUp.setController(signUpController);
         cardPanel.add(signUp, signUp.getViewName());
+        return this;
+    }
+
+    /**
+     * LoggedInView builder.
+     * @return this builder
+     */
+    public AppBuilder addLoggedInView() {
+        final loggedInView loggedIn = new loggedInView(
+                viewManagerModel,
+                sudokuController,
+                resumeController,
+                sudokuBoardViewModel,
+                loggedInViewModel
+                );
+        cardPanel.add(loggedIn, loggedIn.getViewName());
+        return this;
+    }
+
+    /**
+     * LoginView builder.
+     * @return the app
+     */
+    public AppBuilder addLoginView() {
+        final loginView login = new loginView(loginViewModel);
+        login.setController(loginController);
+        cardPanel.add(login, login.getViewName());
         return this;
     }
 
