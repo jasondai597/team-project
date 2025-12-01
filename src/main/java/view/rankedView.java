@@ -83,19 +83,4 @@ public class rankedView extends JPanel implements ActionListener, PropertyChange
     public void propertyChange(PropertyChangeEvent evt) {
     }
 
-    // Greyed out for testing purposes
-//    public static void main(String[] args) {
-//
-//        SwingUtilities.invokeLater(() -> {
-//            JFrame frame = new JFrame("Sudoku App");
-//            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//
-//            frame.setContentPane(new mainView());
-//            frame.pack();
-//            frame.setSize(400, 400);
-//            frame.setLocationRelativeTo(null);
-//            frame.setVisible(true);
-//        });
-//
-//    }
 }

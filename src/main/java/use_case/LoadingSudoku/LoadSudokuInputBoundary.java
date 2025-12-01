@@ -1,8 +1,14 @@
 package use_case.LoadingSudoku;
 
-import use_case.hints.hintInputData;
-
+/**
+ * The Input Boundary for loading a sudoku.
+ *
+ */
 public interface LoadSudokuInputBoundary {
-    public void execute(LoadSudokuInputData loadSudokuInputData);
-
+    /**
+     * The method to execute the loading use case.
+     * @param loadSudokuInputData
+     *      defines the input that the interactor takes.
+     */
+    void execute(LoadSudokuInputData loadSudokuInputData);
 }

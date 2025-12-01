@@ -1,73 +1,58 @@
 package use_case.LoadingSudoku;
-import entity.SudokuPuzzle;
+
 import org.json.JSONObject;
-import use_case.game.GameDataAccess;
+
 import entity.Game;
+import entity.SudokuPuzzle;
+import use_case.game.GameDataAccess;
+import use_case.processUserMoves.ProcessInteractor;
 
 public class LoadSudokuInteractor implements LoadSudokuInputBoundary {
-    private final SudokuRepository repository;
-    private final LoadSudokuOutputBoundary presenter;
-    private final GameDataAccess gameDataAccess;  // 🔹 new field
-    private SudokuPuzzle currentPuzzle;
 
-    // 🔹 New main constructor (we'll start using this later)
-    public LoadSudokuInteractor(SudokuRepository repository,
+    private final SudokuRepository repo;
+    private final LoadSudokuOutputBoundary presenter;
+    private final GameDataAccess gameDataAccess;
+    private final ProcessInteractor processInteractor;
+
+    public LoadSudokuInteractor(SudokuRepository repo,
                                 LoadSudokuOutputBoundary presenter,
-                                GameDataAccess gameDataAccess) {
-        this.repository = repository;
+                                GameDataAccess gameDataAccess,
+                                ProcessInteractor processInteractor) {
+        this.repo = repo;
         this.presenter = presenter;
         this.gameDataAccess = gameDataAccess;
+        this.processInteractor = processInteractor;
     }
 
-    // 🔹 Old constructor kept for compatibility (uses null for now)
-    public LoadSudokuInteractor(SudokuRepository repository,
-                                LoadSudokuOutputBoundary presenter) {
-        this(repository, presenter, null);
-    }
-
+    @Override
     public void execute(LoadSudokuInputData request) {
         try {
-            JSONObject json = repository.fetchSudokuJSON(request.getDifficulty());
-            String puzzle = json.getString("puzzle");
-            String solution = json.getString("solution");
+            final JSONObject json = repo.fetchSudokuJSON(request.getDifficulty());
 
-            int[][] board = SudokuBoardParser.parse(puzzle);
-            int[][] solutionBoard = SudokuBoardParser.parse(solution);
-            currentPuzzle = new SudokuPuzzle(board, solutionBoard, request.getDifficulty());
+            final int[][] initial = SudokuBoardParser.parse(json.getString("puzzle"));
+            final int[][] solution = SudokuBoardParser.parse(json.getString("solution"));
 
-            // 🔹 use GameDataAccess if provided
-            if (gameDataAccess != null) {
-                String gameId = gameDataAccess.generateId();
+            final SudokuPuzzle puzzle = new SudokuPuzzle(initial, solution, request.getDifficulty());
 
-                int[][] currentCopy = copyBoard(board);
-
-                Game game = new Game(
-                        gameId,
-                        currentCopy,
-                        request.getDifficulty(),
-                        "CASUAL",
-                        0L
-                );
-
-                gameDataAccess.save(game);
+            if (processInteractor != null) {
+                processInteractor.setPuzzle(puzzle);
             }
 
-            presenter.present(currentPuzzle);
-        } catch (Exception e) {
+            final String currentGameId = gameDataAccess.generateId();
+            gameDataAccess.save(new Game(
+                    currentGameId,
+                    initial,
+                    request.getDifficulty(),
+                    "CASUAL",
+                    0L
+            ));
+
+            presenter.present(puzzle, currentGameId);
+
+        }
+        catch (Exception e) {
+            e.printStackTrace();
             presenter.presentError("Failed to load board: " + e.getMessage());
         }
-    }
-
-    private int[][] copyBoard(int[][] original) {
-        int[][] copy = new int[original.length][];
-        for (int i = 0; i < original.length; i++) {
-            copy[i] = original[i].clone();
-        }
-        return copy;
-    }
-
-
-    public SudokuPuzzle getCurrentPuzzle() {
-        return currentPuzzle;
     }
 }

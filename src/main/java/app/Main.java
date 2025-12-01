@@ -21,9 +21,12 @@ public class Main {
                     .addSudokuUseCase()
                     .addForfeitUseCase()
                     .addMainView()
+                    .addDifficultyView()
                     .addUnrankedBoardView()
                     .addRankedBoardView()
                     .addForfeitView()
+                    .addWinView()
+                    .addSignUpView() //added sign up view
                     .build();
 
             // Display the application

@@ -6,9 +6,10 @@ import javax.swing.*;
 
 public class CheckPresenter implements CheckOutputBoundary {
     private final SudokuBoardViewModel viewModel;
-
-    public CheckPresenter(SudokuBoardViewModel viewModel) {
+    private final ViewManagerModel viewManagerModel;
+    public CheckPresenter(SudokuBoardViewModel viewModel, ViewManagerModel viewManagerModel) {
         this.viewModel = viewModel;
+        this.viewManagerModel = viewManagerModel;
     }
     @Override
     public void presentAnswer(boolean[][] incorrectCells) {
@@ -16,9 +17,8 @@ public class CheckPresenter implements CheckOutputBoundary {
 
     }
     public void presentWin(){
-        SwingUtilities.invokeLater(() ->
-                JOptionPane.showMessageDialog(null, "Congratulations! You solved the puzzle!", "You Win!", JOptionPane.INFORMATION_MESSAGE)
-        );
+        viewManagerModel.setState("Win");
+        viewManagerModel.firePropertyChange();
 
     }
 }

@@ -1,45 +1,59 @@
 package app;
 
 import API.SudokuApiClient;
-import data_access.InMemoryGameDataAccess;
+import data_access.FirebaseGameDataAccess;
 import data_access.SudokuRepositoryImpl;
-import entity.SudokuPuzzle;
+import data_access.UserAccessDAO;
+import entity.UserFactory;
 import interface_adapter.*;
+import interface_adapter.signUp.SignUpController;
+import interface_adapter.signUp.SignUpPresenter;
+import interface_adapter.signUp.SignUpViewModel;
 import use_case.Check.CheckInteractor;
 import use_case.LoadingSudoku.LoadSudokuInteractor;
 import use_case.game.GameDataAccess;
 import use_case.hints.HintInteractor;
 import use_case.processUserMoves.ProcessInteractor;
+import use_case.save.SaveGameInteractor;   // NEW
+import use_case.resume.ResumeGameInteractor; // NEW
+import use_case.signUp.SignUpInputBoundary;
+import use_case.signUp.SignUpInteractor;
 import view.*;
 
 import javax.swing.*;
 import java.awt.*;
 
-/**
- * AppBuilder constructs the application by wiring all layers following Clean Architecture.
- * Similar to the ca-lab AppBuilder pattern.
- */
 public class AppBuilder {
+
     private final JPanel cardPanel = new JPanel();
     private final CardLayout cardLayout = new CardLayout();
     private final ViewManagerModel viewManagerModel = new ViewManagerModel();
     private final ViewManager viewManager = new ViewManager(cardPanel, cardLayout, viewManagerModel);
 
+    private final UserFactory userFactory = new UserFactory();
+
     // Data Access
     private SudokuApiClient apiClient;
     private SudokuRepositoryImpl repository;
     private GameDataAccess gameDataAccess;
+    private UserAccessDAO userAccessDAO;
 
     // ViewModels
     private SudokuBoardViewModel sudokuBoardViewModel;
     private ForfeitViewModel forfeitViewModel;
+    private SignUpViewModel signUpViewModel;
 
     // Controllers
     private SudokuController sudokuController;
+    private SaveGameController saveController;     // NEW
+    private ResumeGameController resumeController; // NEW
+
     private hintController hintController;
     private processController processController;
     private CheckController checkController;
     private ForfeitController forfeitController;
+
+    private SignUpController signUpController;
 
     // Interactors
     private LoadSudokuInteractor loadSudokuInteractor;
@@ -48,136 +62,144 @@ public class AppBuilder {
         cardPanel.setLayout(cardLayout);
     }
 
-    /**
-     * Adds the Main View to the application.
-     * @return this builder
-     */
-    public AppBuilder addMainView() {
-        if (sudokuController == null) {
-            throw new IllegalStateException("Must initialize Sudoku use case before adding main view");
-        }
-        mainView mainViewPanel = new mainView(viewManagerModel, sudokuController);
-        cardPanel.add(mainViewPanel, mainViewPanel.getViewName());
-        return this;
-    }
-
-    /**
-     * Adds the Unranked Sudoku Board View to the application.
-     * @return this builder
-     */
-    public AppBuilder addUnrankedBoardView() {
-        if (sudokuBoardViewModel == null || sudokuController == null ||
-            hintController == null || processController == null ||
-            checkController == null || forfeitController == null) {
-            throw new IllegalStateException("Must initialize Sudoku use case before adding unranked board view");
-        }
-
-        unRankedSudokuBoardView unrankedView = new unRankedSudokuBoardView(
-                sudokuBoardViewModel, sudokuController, hintController,
-                processController, checkController, forfeitController);
-        cardPanel.add(unrankedView, "unranked");
-        return this;
-    }
-
-    /**
-     * Adds the Ranked Sudoku Board View to the application.
-     * @return this builder
-     */
-    public AppBuilder addRankedBoardView() {
-        if (sudokuBoardViewModel == null || sudokuController == null ||
-            hintController == null || processController == null ||
-            checkController == null || forfeitController == null) {
-            throw new IllegalStateException("Must initialize Sudoku use case before adding ranked board view");
-        }
-
-        rankedSudokuBoardView rankedView = new rankedSudokuBoardView(
-                sudokuBoardViewModel, sudokuController, hintController,
-                processController, checkController, forfeitController);
-        cardPanel.add(rankedView, "ranked");
-        return this;
-    }
-
-    /**
-     * Adds the Forfeit View to the application.
-     * @return this builder
-     */
-    public AppBuilder addForfeitView() {
-        if (forfeitViewModel == null || forfeitController == null) {
-            throw new IllegalStateException("Must initialize Forfeit use case before adding forfeit view");
-        }
-
-        ForfeitView forfeitView = new ForfeitView(forfeitViewModel, forfeitController);
-        cardPanel.add(forfeitView, forfeitView.getViewName());
-        return this;
-    }
-
-    /**
-     * Initializes the Sudoku use case with all necessary components.
-     * @return this builder
-     */
     public AppBuilder addSudokuUseCase() {
-        // Initialize data access
+
         apiClient = new SudokuApiClient();
         repository = new SudokuRepositoryImpl(apiClient);
-        gameDataAccess = new InMemoryGameDataAccess();
+        gameDataAccess = new FirebaseGameDataAccess();
+        userAccessDAO = new UserAccessDAO();
 
-        // Create ViewModels
         sudokuBoardViewModel = new SudokuBoardViewModel();
 
-        // Create Presenters
+        signUpViewModel = new SignUpViewModel();
+
+        // Presenters
         SudokuPresenter sudokuPresenter = new SudokuPresenter(sudokuBoardViewModel);
         HintPresenter hintPresenter = new HintPresenter(sudokuBoardViewModel);
         processPresenter processPresenterAdapter = new processPresenter(sudokuBoardViewModel);
-        CheckPresenter checkPresenter = new CheckPresenter(sudokuBoardViewModel);
+        CheckPresenter checkPresenter = new CheckPresenter(sudokuBoardViewModel, viewManagerModel);
+        SignUpPresenter signUpPresenter = new SignUpPresenter(signUpViewModel, viewManagerModel);
 
-        // Create Interactors (Use Cases)
-        loadSudokuInteractor = new LoadSudokuInteractor(repository, sudokuPresenter, gameDataAccess);
+        // --- INTERACTOR WIRING ---
+
+        // 1. ProcessInteractor (Must be created early to be shared)
+        ProcessInteractor processInteractor = new ProcessInteractor(null, processPresenterAdapter);
+
+        // 2. LoadSudokuInteractor (Now receives ProcessInteractor)
+        loadSudokuInteractor = new LoadSudokuInteractor(
+                repository,
+                sudokuPresenter,
+                gameDataAccess,
+                processInteractor // <== Injection
+        );
+
+        // 3. Save & Resume Interactors (New Architecture)
+        SaveGameInteractor saveInteractor = new SaveGameInteractor(gameDataAccess, sudokuBoardViewModel);
+        ResumeGameInteractor resumeInteractor = new ResumeGameInteractor(gameDataAccess, sudokuPresenter, processInteractor);
+
+        // 4. Other Interactors
         HintInteractor hintInteractor = new HintInteractor(hintPresenter);
-
-        // Create Controllers
-        sudokuController = new SudokuController(loadSudokuInteractor);
-        hintController = new hintController(hintInteractor);
-
-        // Load initial puzzle
-        sudokuController.loadPuzzle("easy");
-
-        // Create process and check controllers after puzzle is loaded
-        SudokuPuzzle puzzle = loadSudokuInteractor.getCurrentPuzzle();
-        ProcessInteractor processInteractor = new ProcessInteractor(puzzle, processPresenterAdapter);
-        processController = new processController(processInteractor);
-
         CheckInteractor checkInteractor = new CheckInteractor(checkPresenter);
+
+        // 5. SignUp Interactor
+        SignUpInputBoundary signUpInteractor = new SignUpInteractor(userAccessDAO, signUpPresenter, userFactory);
+
+        // --- CONTROLLERS ---
+
+        sudokuController = new SudokuController(loadSudokuInteractor);
+        saveController = new SaveGameController(saveInteractor);       // NEW
+        resumeController = new ResumeGameController(resumeInteractor); // NEW
+
+        hintController = new hintController(hintInteractor);
+        processController = new processController(processInteractor);
         checkController = new CheckController(checkInteractor);
+
+        signUpController = new SignUpController(signUpInteractor, viewManagerModel);
 
         return this;
     }
 
-    /**
-     * Initializes the Forfeit use case.
-     * @return this builder
-     */
     public AppBuilder addForfeitUseCase() {
-        if (sudokuBoardViewModel == null) {
-            throw new IllegalStateException("Must initialize Sudoku use case before Forfeit use case");
-        }
         forfeitViewModel = new ForfeitViewModel();
         forfeitController = new ForfeitController(viewManagerModel, sudokuBoardViewModel);
         return this;
     }
 
-    /**
-     * Builds and returns the application as a JFrame.
-     * @return the application frame
-     */
-    public JFrame build() {
-        final JFrame application = new JFrame("Sudoku App");
-        application.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        application.add(cardPanel);
+    public AppBuilder addMainView() {
+        mainView mainViewPanel = new mainView(
+                viewManagerModel,
+                sudokuController,
+                resumeController, // <== Pass Resume Controller
+                sudokuBoardViewModel
+        );
+        cardPanel.add(mainViewPanel, mainViewPanel.getViewName());
+        return this;
+    }
 
-        // Set initial view
+    public AppBuilder addUnrankedBoardView() {
+        unRankedSudokuBoardView unrankedView =
+                new unRankedSudokuBoardView(
+                        sudokuBoardViewModel,
+                        viewManagerModel,
+                        sudokuController,
+                        saveController,   // <== Pass Save Controller
+                        hintController,
+                        processController,
+                        checkController,
+                        forfeitController
+                );
+        cardPanel.add(unrankedView, unrankedView.getViewName());
+        return this;
+    }
+
+    public AppBuilder addRankedBoardView() {
+        rankedSudokuBoardView rankedView =
+                new rankedSudokuBoardView(
+                        sudokuBoardViewModel,
+                        sudokuController,
+                        hintController,
+                        processController,
+                        checkController,
+                        forfeitController
+                );
+        cardPanel.add(rankedView, "ranked");
+        return this;
+    }
+
+    public AppBuilder addForfeitView() {
+        ForfeitView forfeitView = new ForfeitView(forfeitViewModel, forfeitController);
+        cardPanel.add(forfeitView, forfeitView.getViewName());
+        return this;
+    }
+
+    public AppBuilder addWinView(){
+        winView winView = new winView(viewManagerModel, sudokuBoardViewModel);
+        cardPanel.add(winView, winView.getViewName());
+
+        return this;
+    }
+
+    public AppBuilder addDifficultyView(){
+        difficultyView difficultyView = new difficultyView(sudokuController, viewManagerModel);
+        cardPanel.add(difficultyView, "difficulty");
+        return this;
+    }
+
+    public AppBuilder addSignUpView() {
+        signUpView signUp = new signUpView(signUpViewModel);
+        signUp.setController(signUpController);
+        cardPanel.add(signUp, signUp.getViewName());
+        return this;
+    }
+
+    public JFrame build() {
+        JFrame frame = new JFrame("Sudoku App");
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        frame.add(cardPanel);
+
         viewManagerModel.setState("main");
         viewManagerModel.firePropertyChange();
 
-        return application;
+        return frame;
     }
 }

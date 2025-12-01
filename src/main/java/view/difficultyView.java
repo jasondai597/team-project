@@ -1,5 +1,8 @@
 package view;
 
+import interface_adapter.SudokuController;
+import interface_adapter.ViewManagerModel;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -12,8 +15,12 @@ public class difficultyView extends JPanel implements ActionListener, PropertyCh
     private JButton easyButton;
     private JButton mediumButton;
     private JButton hardButton;
+    private SudokuController sudokuController;
+    private ViewManagerModel viewManagerModel;
 
-    public difficultyView() {
+    public difficultyView(SudokuController sudokuController, ViewManagerModel viewManagerModel) {
+        this.viewManagerModel = viewManagerModel;
+        this.sudokuController = sudokuController;
         setLayout(new BorderLayout());
         setBackground(Color.WHITE);
 
@@ -54,13 +61,19 @@ public class difficultyView extends JPanel implements ActionListener, PropertyCh
 
         switch (cmd) {
             case "EASY":
-                System.out.println("easy clicked");
+                sudokuController.loadPuzzle("easy");
+                viewManagerModel.setState("unranked");
+                viewManagerModel.firePropertyChange();
                 break;
             case "MEDIUM":
-                System.out.println("medium clicked");
+                sudokuController.loadPuzzle("medium");
+                viewManagerModel.setState("unranked");
+                viewManagerModel.firePropertyChange();
                 break;
             case "HARD":
-                System.out.println("hard clicked");
+                sudokuController.loadPuzzle("hard");
+                viewManagerModel.setState("unranked");
+                viewManagerModel.firePropertyChange();
                 break;
 
         }
@@ -74,16 +87,7 @@ public class difficultyView extends JPanel implements ActionListener, PropertyCh
     //Greyed out for testing purposes
     public static void main(String[] args) {
 
-        SwingUtilities.invokeLater(() -> {
-            JFrame frame = new JFrame("Sudoku App");
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-            frame.setContentPane(new difficultyView());
-            frame.pack();
-            frame.setSize(400, 400);
-            frame.setLocationRelativeTo(null);
-            frame.setVisible(true);
-        });
 
     }
 }

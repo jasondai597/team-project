@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.Map;
 public class LeaderBoardDAO {
 
-    public CollectionReference leaderboardRef;
-    public Firestore db;
+    private final CollectionReference leaderboardRef;
+    private final Firestore db;
 
     public LeaderBoardDAO() {
         FirebaseInitialize.initFirebase();
@@ -37,7 +37,8 @@ public class LeaderBoardDAO {
     }
 
     public List<Map<String, Object>> getLeaderboard() {
-        ApiFuture<QuerySnapshot> future = leaderboardRef.orderBy("score", com.google.cloud.firestore.Query.Direction.DESCENDING).get();
+        ApiFuture<QuerySnapshot> future = leaderboardRef.orderBy("score",
+                com.google.cloud.firestore.Query.Direction.DESCENDING).get();
         List<Map<String, Object>> leaderboardData = new ArrayList<>();
         try {
             List<QueryDocumentSnapshot> documents = future.get().getDocuments();
