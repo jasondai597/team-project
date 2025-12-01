@@ -5,7 +5,7 @@ import interface_adapter.ViewModel;
 public class LoginViewModel extends ViewModel<LoginState> {
 
     // Define labels for buttons and stuff in view
-    public static final String TITLE_LABEL = "Sign Up";
+    public static final String TITLE_LABEL = "Log In";
     public static final String USERNAME_LABEL = "Enter Username:";
     public static final String PASSWORD_LABEL = "Enter Password:";
     public static final String LOGIN_BUTTON_LABEL = "Login";
