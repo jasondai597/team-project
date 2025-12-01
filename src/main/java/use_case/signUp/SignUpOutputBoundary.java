@@ -1,13 +1,11 @@
 package use_case.signUp;
 
 public interface SignUpOutputBoundary {
-
     /**
-     * prepare success view
+     * prepare success view.
      * @param outputData the output data
      */
     void presentSuccessView(SignUpOutputData outputData);
-
 
     /**
      * Presents a failure view with the given error message.

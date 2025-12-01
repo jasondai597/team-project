@@ -11,9 +11,10 @@ import java.util.Map;
 //import classes from entity
 import entity.User;
 import entity.UserFactory;
+import use_case.login.LoginUserDataAccess;
 import use_case.signUp.SignUpUserDataAccessInterface;
 
-public class UserAccessDAO implements SignUpUserDataAccessInterface {
+public class UserAccessDAO implements SignUpUserDataAccessInterface, LoginUserDataAccess {
 
     private final CollectionReference userRef;
     private final Firestore db;
@@ -54,6 +55,12 @@ public class UserAccessDAO implements SignUpUserDataAccessInterface {
             throw new RuntimeException("Fail to communicate with firebase");
         }
         return exist;
+    }
+
+    @Override
+    public boolean validateUser(String username, String password) {
+        final User user = getUser(username, new UserFactory());
+        return user.getPassword().equals(password);
     }
 
     // add a score given the type (unranked or ranked + difficulty) ex: unranked hard, ranked easy

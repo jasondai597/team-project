@@ -27,6 +27,8 @@ public class Main {
                     .addForfeitView()
                     .addWinView()
                     .addSignUpView() //added sign up view
+                    .addLoggedInView()
+                    .addLoginView()
                     .build();
 
             // Display the application

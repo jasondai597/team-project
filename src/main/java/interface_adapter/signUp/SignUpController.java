@@ -27,7 +27,7 @@ public class SignUpController {
     }
 
     /**
-     * Switch to home if clicked on the home button
+     * Switch to home if clicked on the home button.
      */
     public void switchToHomeView() {
         viewManagerModel.setState("main");
@@ -35,11 +35,8 @@ public class SignUpController {
     }
 
     public void switchToLoginView() {
-        //TODO change set state to loginViewModel.getState later when implemented login view model
-//        viewManagerModel.setState("login");
-//        viewManagerModel.firePropertyChange();
-        // Not implemented yet
-       System.out.println("Login clicked");
+        viewManagerModel.setState("login");
+        viewManagerModel.firePropertyChange();
     }
 
 }

@@ -4,6 +4,8 @@ import interface_adapter.ResumeGameController;
 import interface_adapter.SudokuBoardViewModel;
 import interface_adapter.SudokuController;
 import interface_adapter.ViewManagerModel;
+import interface_adapter.loggedIn.LoggedInState;
+import interface_adapter.loggedIn.LoggedInViewModel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,29 +14,31 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-public class mainView extends JPanel implements ActionListener, PropertyChangeListener {
-
-    private final String viewName = "main";
+public class loggedInView extends JPanel implements ActionListener, PropertyChangeListener {
+    private final String viewName = "loggedIn";
     private final ViewManagerModel viewManagerModel;
     private final SudokuController sudokuController;
     private final ResumeGameController resumeController; // NEW
     private final SudokuBoardViewModel viewModel;
+    private final LoggedInViewModel loggedInViewModel;
 
     private JButton playButton;
     private JButton rankedButton;
     private JButton resumeButton;
-    private JButton loginButton;
-    private JButton signUpButton;
 
-    public mainView(ViewManagerModel viewManagerModel,
+    private JLabel welcome_label;
+
+    public loggedInView(ViewManagerModel viewManagerModel,
                     SudokuController sudokuController,
                     ResumeGameController resumeController, // NEW
-                    SudokuBoardViewModel viewModel) {
-
+                    SudokuBoardViewModel viewModel,
+                    LoggedInViewModel loggedInViewModel) {
         this.viewManagerModel = viewManagerModel;
         this.sudokuController = sudokuController;
         this.resumeController = resumeController;
         this.viewModel = viewModel;
+        this.loggedInViewModel = loggedInViewModel;
+        this.loggedInViewModel.addPropertyChangeListener(this);
 
         setLayout(new BorderLayout());
         setBackground(Color.WHITE);
@@ -63,10 +67,6 @@ public class mainView extends JPanel implements ActionListener, PropertyChangeLi
         rankedButton = new JButton("Ranked");
         rankedButton.setActionCommand("RANKED");
         rankedButton.addActionListener(this);
-        rankedButton.setOpaque(true);
-        rankedButton.setBackground(new Color(196, 196, 196));
-        rankedButton.setForeground(new Color(150, 150, 150));
-        rankedButton.setFocusPainted(false);
 
         centerPanel.add(playButton);
         centerPanel.add(resumeButton);
@@ -74,19 +74,12 @@ public class mainView extends JPanel implements ActionListener, PropertyChangeLi
 
         add(centerPanel, BorderLayout.CENTER);
 
-        // Login
-        loginButton = new JButton("Login");
-        loginButton.setActionCommand("LOGIN");
-        loginButton.addActionListener(this);
-
-        // SignUp
-        signUpButton = new JButton("Signup");
-        signUpButton.setActionCommand("SIGNUP");
-        signUpButton.addActionListener(this);
+        // Welcome User
+        welcome_label = new JLabel();
+        welcome_label.setFont(new Font("Arial", Font.PLAIN, 20));
 
         JPanel bottomPanel = new JPanel();
-        bottomPanel.add(loginButton);
-        bottomPanel.add(signUpButton);
+        bottomPanel.add(welcome_label);
         bottomPanel.setBackground(Color.WHITE);
         bottomPanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
         add(bottomPanel, BorderLayout.SOUTH);
@@ -120,16 +113,6 @@ public class mainView extends JPanel implements ActionListener, PropertyChangeLi
                 viewManagerModel.firePropertyChange();
                 break;
 
-            case "LOGIN":
-                viewManagerModel.setState("login");
-                viewManagerModel.firePropertyChange();
-                break;
-
-            case "SIGNUP":
-                viewManagerModel.setState("signUp");
-                viewManagerModel.firePropertyChange();
-                break;
-
             default:
                 System.out.println("Not implemented yet");
 
@@ -142,6 +125,10 @@ public class mainView extends JPanel implements ActionListener, PropertyChangeLi
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        // nothing for now
+        if (evt.getPropertyName().equals("state")) {
+            // Update welcome to show actual username
+            final LoggedInState state = (LoggedInState) evt.getNewValue();
+            welcome_label.setText("Welcome, " + state.getUsername() + "!");
+        }
     }
 }

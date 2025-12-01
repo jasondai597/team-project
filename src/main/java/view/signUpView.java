@@ -206,6 +206,7 @@ public class signUpView extends JPanel implements ActionListener, PropertyChange
             }
         });
     }
+
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         final SignUpState state = (SignUpState) evt.getNewValue();
