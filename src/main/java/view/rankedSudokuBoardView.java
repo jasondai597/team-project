@@ -97,12 +97,6 @@ public class rankedSudokuBoardView extends JPanel implements ActionListener, Pro
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
 
-        JButton hintBtn = new JButton("HINT");
-        hintBtn.setPreferredSize(new Dimension(140, 60));
-        hintBtn.addActionListener(e -> {
-            if (hint != null && viewModel != null) hint.hint(viewModel.getBoard(), viewModel.getSolution());
-        });
-
         JButton checkBtn = new JButton("CHECK");
         checkBtn.setPreferredSize(new Dimension(140, 60));
         checkBtn.addActionListener(e -> {
@@ -113,7 +107,6 @@ public class rankedSudokuBoardView extends JPanel implements ActionListener, Pro
         forfeitBtn.setPreferredSize(new Dimension(140, 60));
         forfeitBtn.addActionListener(this);
 
-        buttonPanel.add(hintBtn);
         buttonPanel.add(checkBtn);
         buttonPanel.add(forfeitBtn);
 
