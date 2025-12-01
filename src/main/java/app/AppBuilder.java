@@ -172,7 +172,7 @@ public class AppBuilder {
         return this;
     }
 
-    public AppBuilder addWinView(){
+    public AppBuilder addWinView() {
         winView winView = new winView(viewManagerModel, sudokuBoardViewModel);
         cardPanel.add(winView, winView.getViewName());
 

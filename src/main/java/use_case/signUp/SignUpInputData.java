@@ -11,6 +11,7 @@ public class SignUpInputData {
         this.password = password;
         this.repeatPassword = repeatPassword;
     }
+
     public String getUsername() {
         return username;
     }
