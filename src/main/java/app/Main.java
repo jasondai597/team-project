@@ -35,5 +35,6 @@ public class Main {
         application.setSize(applicationSize, applicationSize);
         application.setLocationRelativeTo(null);
         application.setVisible(true);
+        });
     }
 }
