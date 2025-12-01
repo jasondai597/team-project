@@ -117,7 +117,7 @@ public class AppBuilder {
 
         // 5. SignUp/login Interactor
         SignUpInputBoundary signUpInteractor = new SignUpInteractor(userAccessDAO, signUpPresenter, userFactory);
-        LoginInputBoundary loginInteractor = new LoginInteractor(userAccessDAO, loginPresenter, userFactory);
+        LoginInputBoundary loginInteractor = new LoginInteractor(userAccessDAO, loginPresenter);
         // --- CONTROLLERS ---
 
         sudokuController = new SudokuController(loadSudokuInteractor);

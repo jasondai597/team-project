@@ -6,14 +6,11 @@ public class LoginInteractor implements LoginInputBoundary {
 
     private final LoginUserDataAccess userDataAccess;
     private final LoginOutputBoundary presenter;
-    private final UserFactory userFactory;
 
     public LoginInteractor(LoginUserDataAccess userDataAccess,
-                           LoginOutputBoundary presenter,
-                           UserFactory userFactory) {
+                           LoginOutputBoundary presenter) {
         this.userDataAccess = userDataAccess;
         this.presenter = presenter;
-        this.userFactory = userFactory;
     }
 
     @Override
