@@ -1,9 +1,14 @@
 package data_access;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+
 import entity.Game;
 import use_case.game.GameDataAccess;
-
-import java.util.*;
 
 public class InMemoryGameDataAccess implements GameDataAccess {
 
@@ -28,5 +33,10 @@ public class InMemoryGameDataAccess implements GameDataAccess {
     @Override
     public List<Game> listAll() {
         return new ArrayList<>(store.values());
+    }
+
+    @Override
+    public void delete(String gameId) {
+        store.remove(gameId);
     }
 }

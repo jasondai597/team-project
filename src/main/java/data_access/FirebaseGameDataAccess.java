@@ -1,13 +1,24 @@
 package data_access;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.ExecutionException;
+
 import com.google.api.core.ApiFuture;
-import com.google.cloud.firestore.*;
+import com.google.cloud.firestore.CollectionReference;
+import com.google.cloud.firestore.DocumentSnapshot;
+import com.google.cloud.firestore.Firestore;
+import com.google.cloud.firestore.Query;
+import com.google.cloud.firestore.QueryDocumentSnapshot;
+import com.google.cloud.firestore.QuerySnapshot;
 import com.google.firebase.cloud.FirestoreClient;
+
 import entity.Game;
 import use_case.game.GameDataAccess;
-
-import java.util.*;
-import java.util.concurrent.ExecutionException;
 
 public class FirebaseGameDataAccess implements GameDataAccess {
 
@@ -87,6 +98,18 @@ public class FirebaseGameDataAccess implements GameDataAccess {
         }
     }
 
+
+    @Override
+    public void delete(String gameId) {
+        try {
+            System.out.println("FirebaseGameDataAccess: Deleting game with ID: " + gameId);
+            gamesRef.document(gameId).delete().get();
+            System.out.println("FirebaseGameDataAccess: Successfully deleted game: " + gameId);
+        } catch (InterruptedException | ExecutionException e) {
+            System.err.println("FirebaseGameDataAccess: Error deleting game: " + gameId);
+            e.printStackTrace();
+        }
+    }
 
     private List<List<Long>> boardToList(int[][] board) {
         List<List<Long>> outer = new ArrayList<>();

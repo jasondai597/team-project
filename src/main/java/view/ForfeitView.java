@@ -52,15 +52,6 @@ public class ForfeitView extends JPanel implements ActionListener, PropertyChang
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         contentPanel.add(titleLabel);
 
-        contentPanel.add(Box.createRigidArea(new Dimension(0, 20)));
-
-        // Subtitle message
-        JLabel messageLabel = new JLabel("Don't give up! Try again.");
-        messageLabel.setFont(new Font("Arial", Font.PLAIN, 20));
-        messageLabel.setForeground(Color.DARK_GRAY);
-        messageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        contentPanel.add(messageLabel);
-
         contentPanel.add(Box.createRigidArea(new Dimension(0, 40)));
 
         // Stats panel with better formatting

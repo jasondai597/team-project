@@ -9,6 +9,7 @@ public class Game {
     private final String mode;         // "CASUAL" or "RANKED"
     private long elapsedMs;             // snapshot of current elapse time at game end
     private boolean finished;
+    private boolean forfeited;          // true if game was forfeited
 
     public Game(String id,
                 int[][] board,
@@ -22,6 +23,7 @@ public class Game {
         this.mode = mode;
         this.elapsedMs = elapsedMs;
         this.finished = false;
+        this.forfeited = false;
     }
 
     // getters only – keep it immutable for now
@@ -52,6 +54,12 @@ public class Game {
     }
     public boolean isFinished() {
         return finished;
+    }
+    public void setForfeited(boolean forfeited) {
+        this.forfeited = forfeited;
+    }
+    public boolean isForfeited() {
+        return forfeited;
     }
 }
 
