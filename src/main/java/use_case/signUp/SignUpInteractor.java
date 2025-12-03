@@ -7,7 +7,7 @@ import entity.UserFactory;
  * Signup interactor
  */
 
-public class SignUpInteractor implements SignUpInputBoundary{
+public class SignUpInteractor implements SignUpInputBoundary {
     private final SignUpUserDataAccessInterface userDataAccessObject;
     private final SignUpOutputBoundary userPresenter;
     private final UserFactory userFactory;
